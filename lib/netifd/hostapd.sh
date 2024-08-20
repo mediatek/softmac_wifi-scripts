@@ -1100,16 +1100,15 @@ hostapd_set_bss_options() {
 		[ "$auth_cache" = 0 -a "$fils" = 0 ] && append bss_conf "disable_pmksa_caching=1" "$N"
 
 		[ -z "$group_cipher" ] && group_cipher="$wpa_cipher"
+		[ -n "$group_cipher" ] && append bss_conf "group_cipher=$group_cipher" "$N"
 
 		if [ -n "$sae_groups" -o -n "$owe_groups" ]; then
 			case "$auth_type" in
 			sae*)
 				append bss_conf "sae_groups=$sae_groups" "$N"
-				append bss_conf "group_cipher=$group_cipher" "$N"
 			;;
 			owe)
 				append bss_conf "owe_groups=$owe_groups" "$N"
-				append bss_conf "group_cipher=$group_cipher" "$N"
 			;;
 			esac
 		fi
@@ -1838,16 +1837,15 @@ wpa_supplicant_add_network() {
 
 		[ -n "$wpa_pairwise" ] && append network_data "pairwise=$wpa_pairwise" "$N$T"
 		[ -z "$group_cipher" ] && group_cipher="$wpa_cipher"
+		[ -n "$group_cipher" ] && append network_data "group=$group_cipher" "$N$T"
 
 		if [ -n "$sae_groups" -o -n "$owe_groups" ]; then
 			case "$auth_type" in
 			sae*)
 				echo "sae_groups=$sae_groups" >> "$_config"
-				append network_data "group=$group_cipher" "$N$T"
 			;;
 			owe)
 				append network_data "owe_group=$owe_groups" "$N$T"
-				append network_data "group=$group_cipher" "$N$T"
 			;;
 			esac
 		fi
