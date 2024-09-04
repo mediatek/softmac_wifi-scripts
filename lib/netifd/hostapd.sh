@@ -426,7 +426,7 @@ hostapd_common_add_bss_config() {
 	config_add_string group_mgmt_cipher
 
 	config_add_int assoc_phy
-	config_add_int mld_id mld_assoc_phy mld_allowed_phy_bitmap mld_allowed_links
+	config_add_int mld_id mld_assoc_phy mld_allowed_phy_bitmap mld_allowed_links rsn_overriding
 	config_add_boolean mld_primary mld_single_link
 	config_add_string mld_addr
 	config_add_int eml_disable
@@ -1428,8 +1428,9 @@ wpa_supplicant_prepare_interface() {
 
 	_wpa_supplicant_common "$1"
 
-	json_get_vars mode wds multi_ap assoc_phy mld_single_link mld_assoc_phy mld_allowed_phy_bitmap
+	json_get_vars mode wds multi_ap assoc_phy mld_single_link mld_assoc_phy mld_allowed_phy_bitmap rsn_overriding
 	set_default mld_allowed_phy_bitmap 0
+	set_default rsn_overriding 2
 
 	[ -n "$network_bridge" ] && {
 		fail=
@@ -1459,6 +1460,11 @@ wpa_supplicant_prepare_interface() {
 	local country_str=
 	[ -n "$country" ] && {
 		country_str="country=$country"
+	}
+
+	local rsn_overriding_str=
+	[ -n "$rsn_overriding" ] && {
+		rsn_overriding_str="rsn_overriding=$rsn_overriding"
 	}
 
 	local mld_force_single_link=
@@ -1522,6 +1528,7 @@ $tx_queue_data2_burst
 ${mld_connect_band_pref:+mld_connect_band_pref=$mld_connect_band_pref}
 ${mld_force_single_link:+mld_force_single_link=$mld_force_single_link}
 ${mld_allowed_phy_bitmap:+mld_allowed_phy=$mld_allowed_phy_bitmap}
+$rsn_overriding_str
 EOF
 	return 0
 }
