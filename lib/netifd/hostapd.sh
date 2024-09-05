@@ -95,6 +95,34 @@ hostapd_append_wpa_key_mgmt() {
 		esac
 	}
 
+	case "$rsno_auth_type" in
+		sae)
+			case "$encryption_rsno" in
+			*sae-ext*)
+				rsn_override_key_mgmt="SAE-EXT-KEY"
+			;;
+			*)
+				rsn_override_key_mgmt="SAE"
+			;;
+			esac
+			set_default sae_pwe 2
+		;;
+	esac
+
+	case "$rsno_auth_type_2" in
+		sae)
+			case "$encryption_rsno_2" in
+			*sae-ext*)
+				rsn_override_key_mgmt_2="SAE-EXT-KEY"
+			;;
+			*)
+				rsn_override_key_mgmt_2="SAE"
+			;;
+			esac
+			set_default sae_pwe 2
+		;;
+	esac
+
 	[ "$auth_osen" = "1" ] && append wpa_key_mgmt "OSEN"
 }
 
@@ -626,6 +654,7 @@ hostapd_set_bss_options() {
 	local vif="$3"
 
 	wireless_vif_parse_encryption
+	wireless_vif_parse_encryption_rsno
 
 	local bss_conf bss_md5sum ft_key
 	local wep_rekey wpa_group_rekey wpa_pair_rekey wpa_master_rekey wpa_key_mgmt
@@ -732,7 +761,6 @@ hostapd_set_bss_options() {
 		;;
 	esac
 	[ -n "$sae_require_mfp" ] && append bss_conf "sae_require_mfp=$sae_require_mfp" "$N"
-	[ -n "$sae_pwe" ] && append bss_conf "sae_pwe=$sae_pwe" "$N"
 
 	local vlan_possible=""
 
@@ -1022,7 +1050,21 @@ hostapd_set_bss_options() {
 
 		hostapd_append_wpa_key_mgmt
 		[ -n "$wpa_key_mgmt" ] && append bss_conf "wpa_key_mgmt=$wpa_key_mgmt" "$N"
+
+		if [ -n "$rsn_override_key_mgmt" ]; then
+			append bss_conf "rsn_override_key_mgmt=$rsn_override_key_mgmt" "$N"
+			append bss_conf "rsn_override_pairwise=$rsno_wpa_cipher" "$N"
+			append bss_conf "rsn_override_mfp=2" "$N"
+		fi
+
+		if [ -n "$rsn_override_key_mgmt_2" ]; then
+			append bss_conf "rsn_override_key_mgmt_2=$rsn_override_key_mgmt_2" "$N"
+			append bss_conf "rsn_override_pairwise_2=$rsno_wpa_cipher_2" "$N"
+			append bss_conf "rsn_override_mfp_2=2" "$N"
+		fi
 	fi
+
+	[ -n "$sae_pwe" ] && append bss_conf "sae_pwe=$sae_pwe" "$N"
 
 	if [ "$wpa" -ge "2" ]; then
 		json_get_values sae_groups sae_groups
