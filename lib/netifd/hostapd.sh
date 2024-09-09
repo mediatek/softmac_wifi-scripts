@@ -1885,7 +1885,7 @@ wpa_supplicant_add_network() {
 		esac
 
 		[ -n "$wpa_pairwise" ] && append network_data "pairwise=$wpa_pairwise" "$N$T"
-		[ -z "$group_cipher" ] && group_cipher="$wpa_cipher"
+		[ -z "$group_cipher" ] && group_cipher="CCMP TKIP CCMP-256 GCMP GCMP-256"
 		[ -n "$group_cipher" ] && append network_data "group=$group_cipher" "$N$T"
 
 		if [ -n "$sae_groups" -o -n "$owe_groups" ]; then
