@@ -330,6 +330,12 @@ wireless_vif_parse_encryption() {
 	esac
 
 	case "$encryption" in
+		*nosha256*)
+			nosha256=1
+		;;
+	esac
+
+	case "$encryption" in
 		*osen*)
 			auth_osen=1
 		;;
