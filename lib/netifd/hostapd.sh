@@ -1902,31 +1902,13 @@ wpa_supplicant_add_network() {
 		# RSN -> allow management frame protection
 		case "$ieee80211w" in
 			[012])
-				json_get_vars ieee80211w_mgmt_cipher ieee80211w_max_timeout ieee80211w_retry_timeout beacon_prot
+				json_get_vars ieee80211w_max_timeout ieee80211w_retry_timeout beacon_prot
 				append network_data "ieee80211w=$ieee80211w" "$N$T"
 				[ "$ieee80211w" -gt "0" ] && {
-					if [ -z "$group_mgmt_cipher" ]; then
-						case "$group_cipher" in
-						CCMP-256)
-							ieee80211w_mgmt_cipher="BIP-CMAC-256"
-						;;
-						CCMP)
-							ieee80211w_mgmt_cipher="AES-128-CMAC"
-						;;
-						GCMP-256)
-							ieee80211w_mgmt_cipher="BIP-GMAC-256"
-						;;
-						GCMP)
-							ieee80211w_mgmt_cipher="BIP-GMAC-128"
-						;;
-						esac
-					else
-						ieee80211w_mgmt_cipher="$group_mgmt_cipher"
-					fi
 					if [ "$auth_type" = "eap192" ]; then
 						append network_data "group_mgmt=BIP-GMAC-256" "$N$T"
-					else
-						append network_data "group_mgmt=${ieee80211w_mgmt_cipher:-AES-128-CMAC}" "$N$T"
+					elif [ -n "$group_mgmt_cipher" ]; then
+						append network_data "group_mgmt=$group_mgmt_cipher" "$N$T"
 					fi
 					[ -n "$beacon_prot" ] && \
 						append network_data "beacon_prot=$beacon_prot" "$N$T"
