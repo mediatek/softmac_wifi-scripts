@@ -785,7 +785,10 @@ hostapd_set_bss_options() {
 				json_for_each_item append_auth_server auth_server
 				append bss_conf "macaddr_acl=2" "$N"
 				append bss_conf "wpa_psk_radius=2" "$N"
-			elif [ ${#key} -eq 64 ]; then
+			elif [ ${#key} -eq 64 ] && [ $auth_type != "psk-sae" ]; then
+				# QT verifies that password length should not
+				# be greater than 63 characters in
+				# WPA3-Personal transition mode.
 				append bss_conf "wpa_psk=$key" "$N"
 			elif [ ${#key} -ge 8 ] && [ ${#key} -le 63 ]; then
 				append bss_conf "wpa_passphrase=$key" "$N"
