@@ -454,7 +454,7 @@ hostapd_common_add_bss_config() {
 	config_add_string group_mgmt_cipher
 
 	config_add_int assoc_phy
-	config_add_int mld_id mld_assoc_phy mld_allowed_phy_bitmap mld_allowed_links rsn_overriding
+	config_add_int mld_id mld_link_id mld_assoc_phy mld_allowed_phy_bitmap mld_allowed_links rsn_overriding
 	config_add_boolean mld_primary mld_single_link
 	config_add_string mld_addr
 	config_add_int eml_disable
@@ -675,7 +675,7 @@ hostapd_set_bss_options() {
 		eap_server eap_user_file ca_cert server_cert private_key private_key_passwd server_id radius_server_clients radius_server_auth_port \
 		vendor_elements fils ocv apup unsol_bcast_probe_resp_interval fils_discovery_min_interval \
 		fils_discovery_max_interval rnr group_cipher group_mgmt_cipher \
-		mld_id mld_primary mld_addr mld_allowed_links eml_disable eml_resp
+		mld_id mld_link_id mld_primary mld_addr mld_allowed_links eml_disable eml_resp
 
 	set_default fils 0
 	set_default isolate 0
@@ -1405,6 +1405,8 @@ hostapd_set_bss_options() {
 	if [ "$mld_primary" -gt 0 ]; then
 		append bss_conf "mld_primary=${mld_primary}" "$N"
 	fi
+
+	[ -n "$mld_link_id" ] && append bss_conf "mld_link_id=${mld_link_id}" "$N"
 
 	if [ "$mld_allowed_links" -gt 0 ]; then
 		append bss_conf "mld_allowed_links=${mld_allowed_links}" "$N"

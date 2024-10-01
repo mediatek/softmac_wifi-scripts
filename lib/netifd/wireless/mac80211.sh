@@ -823,6 +823,7 @@ fill_mld_params() {
 	local target_mld_id=$1
 	local phy_idx=$(echo $2 | tr -d "phy")
 	local found_mld=0
+	local is_mld_link_id_set=0
 	local is_primary=1
 	local mld_allowed_links=0
 
@@ -830,12 +831,22 @@ fill_mld_params() {
 	for iface in $iface_list
 	do
 		local mld_id="$(uci show wireless.$iface | grep "mld_id" | cut -d '=' -f2 | tr -d "'")"
+		local mld_link_id="$(uci show wireless.$iface | grep "mld_link_id" | cut -d '=' -f2 | tr -d "'")"
 		local radio_id="$(uci show wireless.$iface | grep "device" | cut -d '=' -f2 | tr -d "radio'")"
 		local iface_disabled="$(uci show wireless.$iface | grep "disabled" | cut -d '=' -f2 | tr -d "'")"
 		local ht_mode="$(uci show wireless.radio$radio_id.htmode | cut -d '=' -f2 | tr -d "'")"
 
 		if [ "$iface_disabled" != "1" ] && [ "$mld_id" = "$target_mld_id" ] && [[ "$ht_mode" == "EHT"* ]]; then
-			mld_allowed_links=$(($mld_allowed_links * 2 + 1))
+			if [ -n "$mld_link_id" ]; then
+				is_mld_link_id_set=1
+				mld_allowed_links=$(($mld_allowed_links + 2**$mld_link_id))
+			elif [ "$is_mld_link_id_set" -eq 1 ]; then
+				echo "MLD link id should be set on every link"
+				return 1
+			else
+				mld_allowed_links=$(($mld_allowed_links * 2 + 1))
+			fi
+
 			[ $radio_id -lt $phy_idx ] && is_primary=0
 		fi
 	done
