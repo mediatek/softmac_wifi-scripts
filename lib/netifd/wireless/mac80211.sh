@@ -834,7 +834,7 @@ fill_mld_params() {
 		local iface_disabled="$(uci show wireless.$iface | grep "disabled" | cut -d '=' -f2 | tr -d "'")"
 		local ht_mode="$(uci show wireless.radio$radio_id.htmode | cut -d '=' -f2 | tr -d "'")"
 
-		if [ "$iface_disabled" != "1" ] && [ $mld_id = $target_mld_id ] && [[ "$ht_mode" == "EHT"* ]]; then
+		if [ "$iface_disabled" != "1" ] && [ "$mld_id" = "$target_mld_id" ] && [[ "$ht_mode" == "EHT"* ]]; then
 			mld_allowed_links=$(($mld_allowed_links * 2 + 1))
 			[ $radio_id -lt $phy_idx ] && is_primary=0
 		fi
