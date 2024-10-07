@@ -1529,8 +1529,6 @@ drv_mac80211_setup() {
 	for_each_interface "ap sta adhoc mesh monitor" mac80211_setup_vif
 
 	country_consistent_check
-	[ -n "$sr_enable" ] && echo "$sr_enable" > /sys/kernel/debug/ieee80211/$phy/mt76/sr_enable
-	[ -n "$sr_enhanced" ] && echo "$sr_enhanced" > /sys/kernel/debug/ieee80211/$phy/mt76/sr_enhanced_enable
 
 	[ -x /usr/sbin/wpa_supplicant ] && wpa_supplicant_set_config "$phy" "$radio"
 	[ -x /usr/sbin/hostapd ] && hostapd_set_config "$phy" "$radio"
@@ -1553,6 +1551,9 @@ drv_mac80211_setup() {
 	wireless_set_up
 
 	echo /tmp/%e.core > /proc/sys/kernel/core_pattern
+	phy_idx=$(echo "$phy" | sed 's/phy//')
+	[ -n "$sr_enable" ] && echo "$sr_enable" > /sys/kernel/debug/ieee80211/phy0/mt76/band$phy_idx/sr_enable
+	[ -n "$sr_enhanced" ] && echo "$sr_enhanced" > /sys/kernel/debug/ieee80211/phy0/mt76/band$phy_idx/sr_enhanced_enable
 }
 
 _list_phy_interfaces() {
