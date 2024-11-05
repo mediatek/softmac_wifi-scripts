@@ -1454,9 +1454,9 @@ drv_mac80211_setup() {
 	}
 
 	# each phy sleeps different times to prevent for ubus race condition.
-	if [ "$phy" = "phy1" ]; then
+	if [ "$phy" = "phy1" ] || [ "$radio" = "1" ]; then
 		sleep 3;
-	elif [ "$phy" = "phy2" ]; then
+	elif [ "$phy" = "phy2" ] || [ "$radio" = "2" ]; then
 		sleep 6;
 	fi
 
