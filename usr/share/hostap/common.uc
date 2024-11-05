@@ -294,8 +294,7 @@ const phy_proto = {
 
 	wdev_add: function(name, data) {
 		let phydev = this;
-		/* FIXME Fake single wiphy: always create wdev on phy0 */
-		wdev_create("phy0", name, {
+		wdev_create(this.phy, name, {
 			...data,
 			radio: this.radio,
 		});
