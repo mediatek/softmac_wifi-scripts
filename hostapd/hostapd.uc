@@ -101,7 +101,7 @@ function iface_freq_info(iface, config, params)
 			continue;
 		}
 
-		let val = match(line, /^(vht_oper_chwidth|he_oper_chwidth)=(\d+)/);
+		let val = match(line, /^(vht_oper_chwidth|he_oper_chwidth|eht_oper_chwidth)=(\d+)/);
 		if (!val)
 			continue;
 
