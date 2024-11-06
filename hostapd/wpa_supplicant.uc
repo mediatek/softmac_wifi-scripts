@@ -310,10 +310,9 @@ function iface_event(type, name, data) {
 	ubus.call("service", "event", { type: `wpa_supplicant.${name}.${type}`, data: {} });
 }
 
-function iface_hostapd_notify(phy, ifname, iface, state)
+function iface_hostapd_notify(phy, ifname, iface, state, link_id)
 {
 	let ubus = wpas.data.ubus;
-	let status = iface.status();
 	let msg = { phy: phy };
 
 	wpas.printf(`ucode: mtk: wpa_s in state ${state} notifies hostapd`);
@@ -328,11 +327,13 @@ function iface_hostapd_notify(phy, ifname, iface, state)
 		msg.up = true;
 		break;
 	case "COMPLETED":
+		let status = iface.status(link_id);
 		msg.up = true;
 		msg.frequency = status.frequency;
 		msg.sec_chan_offset = status.sec_chan_offset;
 		msg.ch_width = status.ch_width;
 		msg.bw320_offset = status.bw320_offset;
+		msg.band_idx = status.band_idx;
 		break;
 	default:
 		return;
@@ -351,6 +352,7 @@ function iface_channel_switch(phy, ifname, iface, info)
 		frequency: info.frequency,
 		ch_width: info.ch_width,
 		bw320_offset: info.bw320_offset,
+		band_idx: info.band_idx,
 		sec_chan_offset: info.sec_chan_offset,
 	};
 	ubus.call("hostapd", "apsta_state", msg);
@@ -370,12 +372,24 @@ return {
 	},
 	state: function(ifname, iface, state) {
 		let phy = wpas.data.iface_phy[ifname];
+		let ret = iface.get_valid_links();
+		let link_id = 0, valid_links = ret.valid_links;
 		if (!phy) {
 			wpas.printf(`no PHY for ifname ${ifname}`);
 			return;
 		}
 
-		iface_hostapd_notify(phy, ifname, iface, state);
+		if (valid_links) {
+			while (valid_links) {
+				if (valid_links & 1)
+					iface_hostapd_notify(phy, ifname, iface, state, link_id);
+
+				link_id++;
+				valid_links >>= 1;
+			}
+		} else {
+			iface_hostapd_notify(phy, ifname, iface, state, -1);
+		}
 
 		if (state != "COMPLETED")
 			return;
@@ -401,7 +415,7 @@ return {
 			return;
 		}
 
-		if (ev == "CH_SWITCH_STARTED")
+		if (ev == "CH_SWITCH_STARTED" || ev == "LINK_CH_SWITCH_STARTED")
 			iface_channel_switch(phy, ifname, iface, info);
 	}
 };

@@ -54,7 +54,8 @@ function iface_remove(cfg)
 		return;
 
 	for (let bss in cfg.bss)
-		wdev_remove(bss.ifname);
+		if (!bss.mld_ap || bss.mld_primary == 1)
+			wdev_remove(bss.ifname);
 }
 
 function iface_gen_config(config, start_disabled)
@@ -88,6 +89,7 @@ function iface_freq_info(iface, config, params)
 {
 	let freq = params.frequency;
 	let bw320_offset = params.bw320_offset;
+	let band_idx = params.band_idx;
 	if (!freq)
 		return null;
 
@@ -118,7 +120,7 @@ function iface_freq_info(iface, config, params)
 	if (freq < 4000)
 		width = 0;
 
-	return hostapd.freq_info(freq, sec_offset, width, bw320_offset);
+	return hostapd.freq_info(freq, sec_offset, width, bw320_offset, band_idx);
 }
 
 function iface_add(phy, config, phy_status)
@@ -181,13 +183,15 @@ function __iface_pending_next(pending, state, ret, data)
 		iface_update_supplicant_macaddr(phydev, config);
 		return "create_bss";
 	case "create_bss":
-		let err = phydev.wdev_add(bss.ifname, {
-			mode: "ap",
-			radio: phydev.radio,
-		});
-		if (err) {
-			hostapd.printf(`Failed to create ${bss.ifname} on phy ${phy}: ${err}`);
-			return null;
+		if (!bss.mld_ap || bss.mld_primary == 1) {
+			let err = phydev.wdev_add(bss.ifname, {
+				mode: "ap",
+				radio: phydev.radio,
+			});
+			if (err) {
+				hostapd.printf(`Failed to create ${bss.ifname} on phy ${phy}: ${err}`);
+				return null;
+			}
 		}
 
 		pending.call("wpa_supplicant", "phy_status", {
@@ -212,11 +216,20 @@ function __iface_pending_next(pending, state, ret, data)
 	case "wpas_stopped":
 		if (!iface_add(phy, config))
 			hostapd.printf(`hostapd.add_iface failed for phy ${phy} ifname=${bss.ifname}`);
-		pending.call("wpa_supplicant", "phy_set_state", {
-			phy: phydev.phy,
-			radio: phydev.radio ?? -1,
-			stop: false
-		});
+		let iface = hostapd.interfaces[phy];
+		if (!bss.mld_ap) {
+			pending.call("wpa_supplicant", "phy_set_state", {
+				phy: phydev.phy,
+				radio: phydev.radio ?? -1,
+				stop: false
+			});
+		} else if (iface.is_mld_finished()) {
+			pending.call("wpa_supplicant", "phy_set_state", {
+				phy: "phy0",
+				radio: 0,
+				stop: false
+			});
+		}
 		return null;
 	case "done":
 	default:
@@ -756,6 +769,9 @@ function iface_load_config(phy, radio, filename)
 		    val[0] == "mbssid")
 			config[substr(val[0], 1)] = int(val[1]);
 
+		if (val[0] == "#single_hw")
+			config["single_hw"] = int(val[1]);
+
 		push(config.radio.data, line);
 	}
 
@@ -772,6 +788,12 @@ function iface_load_config(phy, radio, filename)
 			continue;
 		}
 
+		if (val[0] == "mld_ap" && int(val[1]) == 1)
+			bss.mld_ap = 1;
+
+		if (val[0] == "mld_primary" && int(val[1]) == 1)
+			bss.mld_primary = 1;
+
 		if (val[0] == "nas_identifier")
 			bss.nasid = val[1];
 
@@ -786,6 +808,23 @@ function iface_load_config(phy, radio, filename)
 		push(bss.data, line);
 	}
 	f.close();
+
+	let first_mld_bss = 0;
+	for (first_mld_bss = 0; first_mld_bss < length(config.bss); first_mld_bss++) {
+		if (config.bss[first_mld_bss].mld_ap == 1)
+			break;
+	}
+
+	if (config.bss[0].mld_ap != 1 && first_mld_bss != length(config.bss)) {
+		let tmp_bss = config.bss[0];
+		config.bss[0] = config.bss[first_mld_bss];
+		config.bss[first_mld_bss] = tmp_bss;
+
+		let tmp_bssid = config.bss[0].bssid;
+		config.bss[0].bssid = config.bss[first_mld_bss].bssid;
+		config.bss[first_mld_bss].bssid = tmp_bssid;
+		hostapd.printf(`mtk: ucode: switch bss[${first_mld_bss}] to first`);
+	}
 
 	return config;
 }
@@ -850,6 +889,7 @@ let main_obj = {
 			sec_chan_offset: 0,
 			ch_width: -1,
 			bw320_offset: 1,
+			band_idx: 0,
 			csa: true,
 			csa_count: 0,
 		},
@@ -865,6 +905,7 @@ let main_obj = {
 			hostapd.printf(`    * sec_chan_offset: ${req.args.sec_chan_offset}`);
 			hostapd.printf(`    * ch_width: ${req.args.ch_width}`);
 			hostapd.printf(`    * bw320_offset: ${req.args.bw320_offset}`);
+			hostapd.printf(`    * band_idx: ${req.args.band_idx}`);
 			hostapd.printf(`    * csa: ${req.args.csa}`);
 
 			let config = hostapd.data.config[phy];
