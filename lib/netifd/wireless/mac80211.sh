@@ -1488,7 +1488,7 @@ drv_mac80211_setup() {
 	[ "$rxantenna" = "$prev_rxantenna" -a "$txantenna" = "$prev_txantenna" ] || mac80211_reset_config "$phy"
 	wireless_set_data phy="$phy" radio="$radio" txantenna="$txantenna" rxantenna="$rxantenna"
 
-	iw phy phy0 set antenna -b "${band}hz" $txantenna $rxantenna >/dev/null 2>&1
+	iw phy phy0 set antenna $txantenna $rxantenna >/dev/null 2>&1
 	iw phy "$phy" set distance "$distance" >/dev/null 2>&1
 
 	[ -n "$frag" ] && iw phy "$phy" set frag "${frag%%.*}"
