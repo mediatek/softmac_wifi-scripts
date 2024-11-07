@@ -101,7 +101,9 @@ function wdev_create(phy, name, data)
 		req["4addr"] = data["4addr"];
 	if (data.macaddr)
 		req.mac = data.macaddr;
-	if (data.radio != null && data.radio >= 0)
+	if (data.mld_allowed_links != null)
+		req.vif_radio_mask = data.mld_allowed_links;
+	else if (data.radio != null && data.radio >= 0)
 		req.vif_radio_mask = 1 << data.radio;
 
 	nl80211.error();

@@ -188,6 +188,7 @@ function __iface_pending_next(pending, state, ret, data)
 			let err = phydev.wdev_add(bss.ifname, {
 				mode: "ap",
 				radio: phydev.radio,
+				mld_allowed_links: bss.mld_allowed_links,
 			});
 			if (err) {
 				hostapd.printf(`Failed to create ${bss.ifname} on phy ${phy}: ${err}`);
@@ -794,6 +795,9 @@ function iface_load_config(phy, radio, filename)
 
 		if (val[0] == "mld_primary" && int(val[1]) == 1)
 			bss.mld_primary = 1;
+
+		if (val[0] == "mld_allowed_links" && int(val[1]))
+			bss.mld_allowed_links = int(val[1]);
 
 		if (val[0] == "nas_identifier")
 			bss.nasid = val[1];
