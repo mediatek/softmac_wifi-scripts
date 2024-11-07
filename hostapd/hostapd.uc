@@ -225,7 +225,7 @@ function __iface_pending_next(pending, state, ret, data)
 				radio: phydev.radio ?? -1,
 				stop: false
 			});
-		} else if (iface.is_mld_finished()) {
+		} else if (!iface || iface.is_mld_finished()) {
 			pending.call("wpa_supplicant", "phy_set_state", {
 				phy: "phy0",
 				radio: 0,
