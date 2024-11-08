@@ -1200,6 +1200,7 @@ wpa_supplicant_add_interface() {
 	json_add_string mode "$mode"
 	json_add_string config "$_config"
 	json_add_string macaddr "$macaddr"
+	json_add_string mld_allowed_phy_bitmap "$mld_allowed_phy_bitmap"
 	[ -n "$network_bridge" ] && json_add_string bridge "$network_bridge"
 	[ -n "$wds" ] && json_add_boolean 4addr "$wds"
 	json_add_boolean powersave "$powersave"
