@@ -826,6 +826,7 @@ fill_mld_params() {
 	local is_mld_link_id_set=0
 	local is_primary=1
 	local mld_allowed_links=0
+	local mld_radio_mask=0
 
 	iface_list="$(cat /etc/config/wireless | grep wifi-iface | cut -d ' ' -f3 | tr -s "'\n" ' ')"
 	for iface in $iface_list
@@ -849,11 +850,13 @@ fill_mld_params() {
 			fi
 
 			[ $partner_radio_idx -lt $own_radio_idx ] && is_primary=0
+			mld_radio_mask=$(($mld_radio_mask + 2**$partner_radio_idx))
 		fi
 	done
 
 	json_add_string "mld_primary" $is_primary
 	json_add_string "mld_allowed_links" $mld_allowed_links
+	json_add_string "mld_radio_mask" $mld_radio_mask
 
         mld_list="$(cat /etc/config/wireless | grep wifi-mld | cut -d ' ' -f3 | tr -s "'\n" ' ')"
         for m in $mld_list
