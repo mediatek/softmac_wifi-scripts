@@ -771,9 +771,6 @@ function iface_load_config(phy, radio, filename)
 		    val[0] == "mbssid")
 			config[substr(val[0], 1)] = int(val[1]);
 
-		if (val[0] == "#single_hw")
-			config["single_hw"] = int(val[1]);
-
 		push(config.radio.data, line);
 	}
 

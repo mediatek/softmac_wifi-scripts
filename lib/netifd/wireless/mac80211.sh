@@ -654,7 +654,6 @@ ${band_idx:+band_idx=$band_idx}
 ${eml_disable:+eml_disable=$eml_disable}
 ${eml_resp:+eml_resp=$eml_resp}
 #num_global_macaddr=$num_global_macaddr
-#single_hw=1
 $base_cfg
 
 EOF
