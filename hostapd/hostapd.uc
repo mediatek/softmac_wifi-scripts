@@ -197,8 +197,8 @@ function __iface_pending_next(pending, state, ret, data)
 		}
 
 		pending.call("wpa_supplicant", "phy_status", {
-			phy: phydev.phy,
-			radio: phydev.radio ?? -1,
+			phy: bss.mld_ap ? "phy0" : phydev.phy,
+			radio: bss.mld_ap ? 0 : phydev.radio ?? -1,
 		});
 		return "check_phy";
 	case "check_phy":
@@ -210,8 +210,8 @@ function __iface_pending_next(pending, state, ret, data)
 			hostapd.printf(`Failed to bring up phy ${phy} ifname=${bss.ifname} with supplicant provided frequency`);
 		}
 		pending.call("wpa_supplicant", "phy_set_state", {
-			phy: phydev.phy,
-			radio: phydev.radio ?? -1,
+			phy: bss.mld_ap ? "phy0" : phydev.phy,
+			radio: bss.mld_ap ? 0 : phydev.radio ?? -1,
 			stop: true
 		});
 		return "wpas_stopped";
