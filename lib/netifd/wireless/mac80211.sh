@@ -818,6 +818,21 @@ mac80211_set_ifname() {
 	eval "ifname=\"$phy-$prefix\${idx_$prefix:-0}\"; idx_$prefix=\$((\${idx_$prefix:-0 } + 1))"
 }
 
+find_colocated_sta() {
+	local own_radio_idx=$1
+
+	iface_list="$(cat /etc/config/wireless | grep wifi-iface | cut -d ' ' -f3 | tr -s "'\n" ' ')"
+	for iface in $iface_list
+	do
+		local mode="$(uci show wireless.$iface.mode | cut -d '=' -f2 | tr -d "'")"
+		local ifname="$(uci show wireless.$iface | grep ifname | cut -d '=' -f2 | tr -d "'")"
+		[ -n "$ifname" ] && [ "$mode" == "sta" ] && {
+			local mld_allowed_phy_bitmap="$(uci show wireless.$iface | grep mld_allowed_phy_bitmap | cut -d '=' -f2 | tr -d "'")"
+			[ -n "$mld_allowed_phy_bitmap" ] && [ $(($mld_allowed_phy_bitmap & $((1<<$own_radio_idx)))) ] && append active_ifnames "$ifname"
+		}
+	done
+}
+
 fill_mld_params() {
 	local target_mld_id=$1
 	local own_phy_idx=$(echo $2 | tr -d "phy")
@@ -1533,6 +1548,8 @@ drv_mac80211_setup() {
 	active_ifnames=
 	for_each_interface "ap sta adhoc mesh monitor" mac80211_prepare_vif
 	for_each_interface "ap sta adhoc mesh monitor" mac80211_setup_vif
+
+	find_colocated_sta "$radio"
 
 	country_consistent_check
 
