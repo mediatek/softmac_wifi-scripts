@@ -1459,13 +1459,6 @@ drv_mac80211_setup() {
 		}
 	}
 
-	# each phy sleeps different times to prevent for ubus race condition.
-	if [ "$phy" = "phy1" ] || [ "$radio" = "1" ]; then
-		sleep 3;
-	elif [ "$phy" = "phy2" ] || [ "$radio" = "2" ]; then
-		sleep 6;
-	fi
-
 	hostapd_conf_file="/var/run/hostapd-$phy$vif_phy_suffix.conf"
 
 	macidx=0
@@ -1493,6 +1486,13 @@ drv_mac80211_setup() {
 
 	[ "$rxantenna" = "$prev_rxantenna" -a "$txantenna" = "$prev_txantenna" ] || mac80211_reset_config "$phy"
 	wireless_set_data phy="$phy" radio="$radio" txantenna="$txantenna" rxantenna="$rxantenna"
+
+	# each phy sleeps different times to prevent for ubus race condition.
+	if [ "$phy" = "phy1" ] || [ "$radio" = "1" ]; then
+		sleep 3;
+	elif [ "$phy" = "phy2" ] || [ "$radio" = "2" ]; then
+		sleep 6;
+	fi
 
 	iw phy phy0 set antenna $txantenna $rxantenna >/dev/null 2>&1
 	iw phy "$phy" set distance "$distance" >/dev/null 2>&1
