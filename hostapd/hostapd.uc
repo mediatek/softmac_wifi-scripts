@@ -198,7 +198,7 @@ function __iface_pending_next(pending, state, ret, data)
 
 		pending.call("wpa_supplicant", "phy_status", {
 			phy: bss.mld_ap ? "phy0" : phydev.phy,
-			radio: bss.mld_ap ? 0 : phydev.radio ?? -1,
+			radio: phydev.radio ?? -1,
 		});
 		return "check_phy";
 	case "check_phy":
