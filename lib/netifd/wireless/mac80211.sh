@@ -1432,6 +1432,55 @@ country_consistent_check() {
 	done
 }
 
+set_antenna() {
+	local phy=$1
+	local radio_list="$(uci show wireless | grep wifi-device | cut -d '=' -f 1 | cut -d '.' -f 2)"
+	local radio
+	local radio_idx
+	local is_disabled
+	local antenna_mask
+	local offset
+	local radio_tx_antenna
+	local radio_rx_antenna
+	local wiphy_tx_antenna=0
+	local wiphy_rx_antenna=0
+
+	for radio in $radio_list
+	do
+		is_disabled="$(uci show wireless.${radio} | grep "disabled" | cut -d '=' -f 2 | tr -d "'")"
+		radio_idx="$(uci show wireless.${radio}.radio | cut -d '=' -f 2 | tr -d "'")"
+		radio_tx_antenna="$(uci show wireless.${radio} | grep txantenna | cut -d '=' -f 2 | tr -d "'")"
+		radio_rx_antenna="$(uci show wireless.${radio} | grep rxantenna | cut -d '=' -f 2 | tr -d "'")"
+		antenna_mask="$(iw phy ${phy} info | grep "wiphy radio" -A 21 | grep "Idx $radio_idx" -A 2 | grep "antenna_mask" | cut -d ' ' -f 2 | cut -d 'x' -f 2)"
+		antenna_mask=$((0x$antenna_mask))
+
+		offset=0
+		while [ $(($antenna_mask & 1)) -eq 0 ]
+		do
+			antenna_mask=$(($antenna_mask >> 1))
+			offset=$(($offset + 1))
+		done
+
+		if [ "$is_disabled" -ne "1" ] && [ -n "$radio_tx_antenna" ]; then
+			radio_tx_antenna=$(($radio_tx_antenna & $antenna_mask))
+		else
+			radio_tx_antenna=$antenna_mask
+		fi
+
+		wiphy_tx_antenna=$(($wiphy_tx_antenna+$(($radio_tx_antenna << $offset))))
+
+		if [ "$is_disabled" -ne "1" ] && [ -n "$radio_rx_antenna" ]; then
+			radio_rx_antenna=$(($radio_rx_antenna & $antenna_mask))
+		else
+			radio_rx_antenna=$antenna_mask
+		fi
+
+		wiphy_rx_antenna=$(($wiphy_rx_antenna+$(($radio_rx_antenna << $offset))))
+	done
+
+	iw phy $phy set antenna $wiphy_tx_antenna $wiphy_rx_antenna >/dev/null 2>&1
+}
+
 drv_mac80211_setup() {
 	json_select config
 	json_get_vars \
@@ -1509,7 +1558,7 @@ drv_mac80211_setup() {
 		sleep 6;
 	fi
 
-	iw phy phy0 set antenna $txantenna $rxantenna >/dev/null 2>&1
+	set_antenna $phy
 	iw phy "$phy" set distance "$distance" >/dev/null 2>&1
 
 	[ -n "$frag" ] && iw phy "$phy" set frag "${frag%%.*}"
