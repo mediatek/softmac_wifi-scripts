@@ -167,6 +167,14 @@ mac80211_hostapd_setup_base() {
 	chan_ofs=0
 	[ "$band" = "6g" ] && chan_ofs=1
 
+	if [ "$band" = "6g" ]; then
+		nl_band=4
+	elif [ "$band" = "5g" ]; then
+		nl_band=2
+	else
+		nl_band=1
+	fi
+
 	if [ "$band" != "6g" ]; then
 		ieee80211n=1
 		ht_capab=
@@ -241,12 +249,7 @@ mac80211_hostapd_setup_base() {
 			}
 
 			ht_cap_mask=0
-			[ "$band" = "2g" ] && {
-				ht_cap_mask=$(iw phy phy0 info | grep 'Band 1:' -A 1 | grep 'Capabilities: ' | cut -d: -f2)
-			}
-			[ "$band" = "5g" ] && {
-				ht_cap_mask=$(iw phy phy0 info | grep 'Band 2:' -A 1 | grep 'Capabilities: ' | cut -d: -f2)
-			}
+			ht_cap_mask=$(iw phy "$phy" info | grep "Band ${nl_band}:" -A 1 | grep 'Capabilities: ' | cut -d: -f2)
 
 			cap_rx_stbc=$((($ht_cap_mask >> 8) & 3))
 			[ "$rx_stbc" -lt "$cap_rx_stbc" ] && cap_rx_stbc="$rx_stbc"
@@ -523,9 +526,9 @@ mac80211_hostapd_setup_base() {
 			he_bss_color \
 			he_bss_color_enabled:1
 
-		he_phy_cap=$(iw phy "$phy" info | sed -n '/HE Iftypes: .*AP/,$p' | awk -F "[()]" '/HE PHY Capabilities/ { print $2 }' | head -1)
+		he_phy_cap=$(iw phy "$phy" info | sed -n '/Band '"${nl_band}"'/,$p' | sed -n '/HE Iftypes: .*AP/,$p' | awk -F "[()]" '/HE PHY Capabilities/ { print $2 }' | head -1)
 		he_phy_cap=${he_phy_cap:2}
-		he_mac_cap=$(iw phy "$phy" info | sed -n '/HE Iftypes: .*AP/,$p' | awk -F "[()]" '/HE MAC Capabilities/ { print $2 }' | head -1)
+		he_mac_cap=$(iw phy "$phy" info | sed -n '/Band '"${nl_band}"'/,$p' | sed -n '/HE Iftypes: .*AP/,$p' | awk -F "[()]" '/HE MAC Capabilities/ { print $2 }' | head -1)
 		he_mac_cap=${he_mac_cap:2}
 
 		append base_cfg "ieee80211ax=1" "$N"
