@@ -199,6 +199,7 @@ wifi_config() {
 	fi
 
 	[ ! -f /etc/config/wireless ] && touch /etc/config/wireless
+	sleep 1
 	ucode /lib/wifi/mac80211.uc | uci -q batch
 
 	for driver in $DRIVERS; do (
