@@ -947,7 +947,10 @@ hostapd_set_bss_options() {
 	set_default wps_pbc_in_m1 0
 
 	config_methods=
-	[ "$wps_pushbutton" -gt 0 ] && append config_methods push_button
+	[ "$wps_pushbutton" -gt 0 ] && {
+		append config_methods push_button
+		append bss_conf "wps_cred_add_sae=1" "$N"
+	}
 	[ "$wps_label" -gt 0 ] && append config_methods label
 
 	# WPS not possible on Multi-AP backhaul-only SSID
@@ -1580,6 +1583,7 @@ ${mld_connect_band_pref:+mld_connect_band_pref=$mld_connect_band_pref}
 ${mld_force_single_link:+mld_force_single_link=$mld_force_single_link}
 ${mld_allowed_phy_bitmap:+mld_allowed_phy=$mld_allowed_phy_bitmap}
 $rsn_overriding_str
+wps_cred_add_sae=1
 EOF
 	return 0
 }
