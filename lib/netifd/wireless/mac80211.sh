@@ -30,7 +30,7 @@ drv_mac80211_init_device_config() {
 	config_add_string tx_burst
 	config_add_string distance
 	config_add_int radio beacon_int chanbw frag rts
-	config_add_int mbssid mu_onoff sr_enable sr_enhanced rnr obss_interval band_idx
+	config_add_int mbssid mu_onoff sr_enable sr_enhanced rnr obss_interval
 	config_add_int rxantenna txantenna txpower min_tx_power
 	config_add_int num_global_macaddr multiple_bssid
 	config_add_boolean noscan ht_coex acs_exclude_dfs background_radar
@@ -152,7 +152,7 @@ mac80211_hostapd_setup_base() {
 	[ -n "$acs_exclude_dfs" ] && [ "$acs_exclude_dfs" -gt 0 ] &&
 		append base_cfg "acs_exclude_dfs=1" "$N"
 
-	json_get_vars noscan ht_coex min_tx_power:0 tx_burst mbssid mu_onoff rnr obss_interval band_idx
+	json_get_vars noscan ht_coex min_tx_power:0 tx_burst mbssid mu_onoff rnr obss_interval
 	json_get_vars etxbfen:1 itxbfen:0 eml_disable eml_resp
 	json_get_values ht_capab_list ht_capab
 	json_get_values channel_list channels
@@ -653,7 +653,6 @@ ${mu_onoff:+mu_onoff=$mu_onoff}
 ${itxbfen:+ibf_enable=$itxbfen}
 ${rnr:+rnr=$rnr}
 ${multiple_bssid:+mbssid=$multiple_bssid}
-${band_idx:+band_idx=$band_idx}
 ${eml_disable:+eml_disable=$eml_disable}
 ${eml_resp:+eml_resp=$eml_resp}
 #num_global_macaddr=$num_global_macaddr

@@ -125,19 +125,16 @@ for (let phy_name, phy in board.wlan) {
 		let background_radar = 0;
 		let encryption = "none";
 		let mbo = 0;
-		let band_idx = 0;
 		let ssid = "";
 
 		if (band_name == "6g") {
 			encryption = "sae";
 			mbo = 1;
-			band_idx = 2;
 			ssid = "OpenWrt-6g";
 		} else if (band_name == "5g") {
 			noscan = 1;
 			rnr = 1;
 			background_radar = 1;
-			band_idx = 1;
 			ssid = "OpenWrt-5g";
 		} else {
 			noscan = 1;
@@ -155,7 +152,6 @@ set ${s}.country='${country || 'US'}'
 set ${s}.num_global_macaddr='${num_global_macaddr || ''}'
 set ${s}.disabled='${defaults ? 0 : disabled}'
 set ${s}.noscan=${noscan}
-set ${s}.band_idx=${band_idx}
 `);
 
 		let si_mld = si + "_mld";
