@@ -817,7 +817,8 @@ function iface_load_config(phy, radio, filename)
 			break;
 	}
 
-	if (config.bss[0].mld_ap != 1 && first_mld_bss != length(config.bss)) {
+	if (length(config.bss) > 1 && config.bss[0].mld_ap != 1 &&
+	    first_mld_bss != length(config.bss)) {
 		let tmp_bss = config.bss[0];
 		config.bss[0] = config.bss[first_mld_bss];
 		config.bss[first_mld_bss] = tmp_bss;
