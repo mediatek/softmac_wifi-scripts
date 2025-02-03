@@ -124,11 +124,16 @@ for (let phy_name, phy in board.wlan) {
 		let rnr = 0;
 		let background_radar = 0;
 		let encryption = "none";
+		let mld_encryption = "psk2";
+		let mld_encryption_rsno = "sae";
+		let mld_ieee80211w = "1";
 		let mbo = 0;
 		let ssid = "";
 
 		if (band_name == "6g") {
 			encryption = "sae";
+			mld_encryption = "sae";
+			mld_ieee80211w = "2";
 			mbo = 1;
 			ssid = "OpenWrt-6g";
 		} else if (band_name == "5g") {
@@ -155,13 +160,19 @@ set ${s}.noscan=${noscan}
 `);
 
 		let si_mld = si + "_mld";
-		if (has_mlo)
+		if (has_mlo) {
 			print(`set ${si_mld}=wifi-iface
 set ${si_mld}.device='${name}'
 set ${si_mld}.network='lan'
 set ${si_mld}.mode='ap'
 set ${si_mld}.mld_id=${mld_id}
+set ${si_mld}.ieee80211w='${mld_ieee80211w}'
+set ${si_mld}.encryption='${mld_encryption}'
 `);
+			if (band_name != "6g")
+				print(`set ${si_mld}.encryption_rsno=${mld_encryption_rsno}
+`);
+		}
 
 		print(`set ${si}=wifi-iface
 set ${si}.device='${name}'
@@ -208,10 +219,9 @@ set ${si}.ieee80211w=2
 set ${mld_sec}.ifname=ap-mld-1
 set ${mld_sec}.mld_id=${mld_id}
 set ${mld_sec}.ssid='MT76_AP_MLD'
-set ${mld_sec}.encryption=sae
+set ${mld_sec}.encryption_rsno_2='sae-ext'
 set ${mld_sec}.key=12345678
 set ${mld_sec}.sae_pwe=2
-set ${mld_sec}.ieee80211w=2
 `);
 		if (random_mac_bytes)
 			print(`set ${mld_sec}.mld_addr=00:22:55:66${random_mac_bytes}
