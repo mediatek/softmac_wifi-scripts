@@ -251,6 +251,8 @@ wireless_vif_parse_encryption() {
 
 	if [ "$hwmode" = "ad" ]; then
 		wpa_cipher="GCMP"
+	elif [ "$_w_mode" = "sta" ]; then
+		wpa_cipher="CCMP CCMP-256 GCMP GCMP-256"
 	else
 		wpa_cipher="CCMP"
 	fi
