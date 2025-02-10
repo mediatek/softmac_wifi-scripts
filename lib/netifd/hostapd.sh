@@ -1159,6 +1159,10 @@ hostapd_set_bss_options() {
 				append bss_conf "owe_groups=$owe_groups" "$N"
 			;;
 			esac
+
+			if [ "$rsno_auth_type" == "sae" ] || [ "$rsno_auth_type_2" == "sae" ]; then
+				append bss_conf "sae_groups=$sae_groups" "$N"
+			fi
 		fi
 
 		# RSN -> allow management frame protection
