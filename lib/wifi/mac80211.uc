@@ -136,6 +136,7 @@ for (let phy_name, phy in board.wlan) {
 			mld_ieee80211w = "2";
 			mbo = 1;
 			ssid = "OpenWrt-6g";
+			mbssid = 1;
 		} else if (band_name == "5g") {
 			noscan = 1;
 			rnr = 1;
