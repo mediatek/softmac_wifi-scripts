@@ -61,6 +61,9 @@ hostapd_append_wpa_key_mgmt() {
 		;;
 		sae)
 			case "$encryption" in
+			sae+sae-ext)
+				append wpa_key_mgmt "SAE SAE-EXT-KEY"
+			;;
 			*sae-ext*)
 				append wpa_key_mgmt "SAE-EXT-KEY"
 			;;
