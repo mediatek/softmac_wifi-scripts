@@ -660,7 +660,7 @@ hostapd_set_bss_options() {
 	wireless_vif_parse_encryption_rsno
 
 	local bss_conf bss_md5sum ft_key
-	local wep_rekey wpa_group_rekey wpa_pair_rekey wpa_master_rekey wpa_key_mgmt
+	local wep_rekey wpa_group_rekey wpa_pair_rekey wpa_master_rekey wpa_key_mgmt rsn_override_key_mgmt rsn_override_key_mgmt_2
 
 	json_get_vars \
 		wep_rekey wpa_group_rekey wpa_pair_rekey wpa_master_rekey wpa_strict_rekey \
