@@ -123,7 +123,7 @@ for (let phy_name, phy in board.wlan) {
 		let mbssid = 0;
 		let rnr = 0;
 		let background_radar = 0;
-		let encryption = "none";
+		let encryption = "owe";
 		let mld_encryption = "psk2";
 		let mld_encryption_rsno = "sae";
 		let mld_ieee80211w = "1";
@@ -131,7 +131,6 @@ for (let phy_name, phy in board.wlan) {
 		let ssid = "";
 
 		if (band_name == "6g") {
-			encryption = "sae";
 			mld_encryption = "sae";
 			mld_ieee80211w = "2";
 			mbo = 1;
@@ -201,6 +200,9 @@ set ${si}.mbo=${mbo}
 set ${si}.sae_pwe=2
 set ${si}.ieee80211w=2
 `);
+		if (encryption == "owe")
+			print(`set ${si}.ieee80211w=2
+`);
 		if (random_mac_bytes) {
 			print(`set ${si}.macaddr=00:0${idx}:55:66${random_mac_bytes}
 `);
@@ -222,7 +224,7 @@ set ${mld_sec}.mld_id=${mld_id}
 set ${mld_sec}.ssid='MT76_AP_MLD'
 set ${mld_sec}.encryption_rsno_2='sae-ext'
 set ${mld_sec}.key=12345678
-set ${mld_sec}.sae_pwe=2
+set ${mld_sec}.sae_pwe=1
 `);
 		if (random_mac_bytes)
 			print(`set ${mld_sec}.mld_addr=00:22:55:66${random_mac_bytes}
