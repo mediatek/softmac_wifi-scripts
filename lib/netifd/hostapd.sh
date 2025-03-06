@@ -1145,6 +1145,10 @@ hostapd_set_bss_options() {
 				set_default auth_cache 0
 			;;
 			esac
+
+			if [ "$rsno_auth_type" == "sae" ] || [ "$rsno_auth_type_2" == "sae" ]; then
+				auth_cache=1
+			fi
 		fi
 
 		append bss_conf "okc=$auth_cache" "$N"
