@@ -1417,7 +1417,7 @@ hostapd_set_bss_options() {
 	fi
 
 	if [ "$mld_primary" -gt 0 ]; then
-		append bss_conf "mld_primary=${mld_primary}" "$N"
+		append bss_conf "#mld_primary=${mld_primary}" "$N"
 	fi
 
 	[ -n "$mld_link_id" ] && append bss_conf "mld_link_id=${mld_link_id}" "$N"
@@ -1427,7 +1427,7 @@ hostapd_set_bss_options() {
 	fi
 
 	if [ "$mld_radio_mask" -gt 0 ]; then
-		append bss_conf "mld_radio_mask=${mld_radio_mask}" "$N"
+		append bss_conf "#mld_radio_mask=${mld_radio_mask}" "$N"
 	fi
 
 	if [ -n "$eml_disable" ]; then
