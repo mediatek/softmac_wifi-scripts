@@ -1155,7 +1155,13 @@ hostapd_set_bss_options() {
 		[ "$auth_cache" = 0 -a "$fils" = 0 ] && append bss_conf "disable_pmksa_caching=1" "$N"
 
 		[ -z "$group_cipher" ] && group_cipher="$wpa_cipher"
-		[ -n "$group_cipher" ] && append bss_conf "group_cipher=$group_cipher" "$N"
+		if [ -n "$group_cipher" ]; then
+			if [ "$group_cipher" == "CCMP TKIP" ]; then
+				append bss_conf "group_cipher=CCMP" "$N"
+			else
+				append bss_conf "group_cipher=$group_cipher" "$N"
+			fi
+		fi
 
 		if [ -n "$sae_groups" -o -n "$owe_groups" ]; then
 			case "$auth_type" in
