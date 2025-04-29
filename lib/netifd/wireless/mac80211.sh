@@ -421,7 +421,6 @@ mac80211_hostapd_setup_base() {
 		vht_cap="$(( ($vht_cap & ~(0x700)) | ($cap_rx_stbc << 8) ))"
 
 		[ "$vht_oper_chwidth" -lt 2 ] && {
-			vht160=0
 			short_gi_160=0
 		}
 
