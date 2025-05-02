@@ -1159,7 +1159,7 @@ hostapd_set_bss_options() {
 
 		[ -z "$group_cipher" ] && group_cipher="$wpa_cipher"
 		if [ -n "$group_cipher" ]; then
-			if [ "$group_cipher" == "CCMP TKIP" ]; then
+			if [ "$group_cipher" == "CCMP TKIP" ] || [ "$group_cipher" == "CCMP GCMP-256" ]; then
 				append bss_conf "group_cipher=CCMP" "$N"
 			else
 				append bss_conf "group_cipher=$group_cipher" "$N"
