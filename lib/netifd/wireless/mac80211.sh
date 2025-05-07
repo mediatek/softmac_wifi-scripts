@@ -892,8 +892,8 @@ fill_mld_params() {
                 option_list="$(uci show wireless.$m | tr -s "\n" ' ')"
                 for option in $option_list
                 do
-                        local key="$(echo $option | cut -d '.' -f3 | cut -d '=' -f1)"
-                        local val="$(echo $option | cut -d '.' -f3 | cut -d '=' -f2 | tr -d "'")"
+                        local key="$(echo $option | cut -d '=' -f1 | cut -d '.' -f3)"
+                        local val="$(echo $option | cut -d '=' -f2 | tr -d "'")"
 			[ -n "$key" ] && json_add_string $key $val
                 done
         done
