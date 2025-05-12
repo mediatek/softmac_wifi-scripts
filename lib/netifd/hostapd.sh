@@ -200,7 +200,7 @@ hostapd_prepare_device_config() {
 			[ -n "$local_pwr_constraint" ] && append base_cfg "local_pwr_constraint=$local_pwr_constraint" "$N"
 			[ "$spectrum_mgmt_required" -gt 0 ] && append base_cfg "spectrum_mgmt_required=$spectrum_mgmt_required" "$N"
 		}
-		[ "$hwmode" = "a" -a "$doth" -gt 0 ] && append base_cfg "ieee80211h=1" "$N"
+		[ "$hwmode" = "a" -a "$doth" -gt 0 ] && [ "$band" = "5g" ] && append base_cfg "ieee80211h=1" "$N"
 	}
 
 	[ -n "$acs_chan_bias" ] && append base_cfg "acs_chan_bias=$acs_chan_bias" "$N"
