@@ -1614,7 +1614,7 @@ drv_mac80211_setup() {
 	[ -x /usr/sbin/wpa_supplicant ] && wpa_supplicant_set_config "$phy" "$radio"
 	[ -x /usr/sbin/hostapd ] && hostapd_set_config "$phy" "$radio"
 
-	[ -x /usr/sbin/wpa_supplicant ] && wpa_supplicant_start "$phy" "$radio"
+	[ -x /usr/sbin/wpa_supplicant ] && [ -z "$hostapd_ctrl" ] && wpa_supplicant_start "$phy" "$radio"
 
 	json_set_namespace wdev_uc prev
 	wdev_tool "$phy$phy_suffix" set_config "$(json_dump)" $active_ifnames
