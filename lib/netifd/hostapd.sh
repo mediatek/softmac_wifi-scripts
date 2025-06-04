@@ -88,7 +88,7 @@ hostapd_append_wpa_key_mgmt() {
 		;;
 	esac
 
-	[ "$fils" -gt 0 ] && {
+	[ -n "$fils" ] && [ "$fils" -gt 0 ] && {
 		case "$auth_type" in
 			eap192)
 				append wpa_key_mgmt FILS-SHA384
@@ -706,6 +706,7 @@ hostapd_set_bss_options() {
 	set_default airtime_bss_limit 0
 	set_default eap_server 0
 	set_default apup 0
+	set_default unsol_bcast_probe_resp_interval 0
 
 	/usr/sbin/hostapd -vfils || fils=0
 
@@ -1425,17 +1426,17 @@ hostapd_set_bss_options() {
 		fi
 	fi
 
-	if [ "$mld_primary" -gt 0 ]; then
+	if [ -n "$mld_primary" ] && [ "$mld_primary" -gt 0 ]; then
 		append bss_conf "#mld_primary=${mld_primary}" "$N"
 	fi
 
 	[ -n "$mld_link_id" ] && append bss_conf "mld_link_id=${mld_link_id}" "$N"
 
-	if [ "$mld_allowed_links" -gt 0 ]; then
+	if [ -n "$mld_allowed_links" ] && [ "$mld_allowed_links" -gt 0 ]; then
 		append bss_conf "mld_allowed_links=${mld_allowed_links}" "$N"
 	fi
 
-	if [ "$mld_radio_mask" -gt 0 ]; then
+	if [ -n "$mld_radio_mask" ] && [ "$mld_radio_mask" -gt 0 ]; then
 		append bss_conf "#mld_radio_mask=${mld_radio_mask}" "$N"
 	fi
 

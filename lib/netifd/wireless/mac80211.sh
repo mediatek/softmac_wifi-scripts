@@ -556,7 +556,7 @@ mac80211_hostapd_setup_base() {
 			append base_cfg "he_twt_responder=$he_twt_responder" "$N"
 		fi
 		if [ "$he_bss_color_enabled" -gt 0 ]; then
-			if !([ "$he_bss_color" -gt 0 ] && [ "$he_bss_color" -le 64 ]); then
+			if !([ -n "$he_bss_color" ] && [ "$he_bss_color" -gt 0 ] && [ "$he_bss_color" -le 64 ]); then
 				rand=$(head -n 1 /dev/urandom | tr -dc 0-9 | head -c 2 | sed 's/^0*//')
 				he_bss_color=$((rand % 63 + 1))
 			fi
@@ -1017,7 +1017,7 @@ mac80211_prepare_vif() {
 
 			local retry=5
 			local ifname_folder="/sys/class/ieee80211/$phy/device/net/$ifname"
-			while [ "$retry" -gt 0 ] && [ "$mld_primary" -eq 0 ] && [ ! -d $ifname_folder ]
+			while [ "$retry" -gt 0 ] && [ -n "$mld_primary" ] && [ "$mld_primary" -eq 0 ] && [ ! -d $ifname_folder ]
 			do
 				echo "$phy:$ifname is not mld primary and does not exist, sleep 1s"
 				retry=$((retry - 1))
