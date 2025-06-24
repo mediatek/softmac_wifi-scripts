@@ -465,6 +465,7 @@ hostapd_common_add_bss_config() {
 	config_add_string mld_addr
 	config_add_int eml_disable
 	config_add_int eml_resp
+	config_add_string mtk_vendor_element
 }
 
 hostapd_set_vlan_file() {
@@ -1645,7 +1646,8 @@ wpa_supplicant_add_network() {
 		basic_rate mcast_rate \
 		ieee80211w ieee80211r fils ocv \
 		multi_ap \
-		default_disabled
+		default_disabled \
+		mtk_vendor_element
 
 	case "$auth_type" in
 		sae|owe|eap2|eap192)
@@ -1696,6 +1698,7 @@ wpa_supplicant_add_network() {
 	}
 
 	[ -n "$ocv" ] && append network_data "ocv=$ocv" "$N$T"
+	[ -n "$mtk_vendor_element" ] && append network_data "mtk_vendor_element=\"$mtk_vendor_element\"" "$N$T"
 
 	case "$auth_type" in
 		none) ;;
