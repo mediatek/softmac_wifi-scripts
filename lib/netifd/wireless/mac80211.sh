@@ -1015,13 +1015,13 @@ mac80211_prepare_vif() {
 				type=interface
 			fi
 
-			local retry=5
+			local retry=15
 			local ifname_folder="/sys/class/ieee80211/$phy/device/net/$ifname"
 			while [ "$retry" -gt 0 ] && [ -n "$mld_primary" ] && [ "$mld_primary" -eq 0 ] && [ ! -d $ifname_folder ]
 			do
 				echo "$phy:$ifname is not mld primary and does not exist, sleep 1s"
 				retry=$((retry - 1))
-				sleep 1
+				sleep 3
 			done
 
 			[ "$retry" -eq 0 ] && [ ! -d $ifname_folder ] && return
