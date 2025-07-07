@@ -467,6 +467,7 @@ hostapd_common_add_bss_config() {
 	config_add_int eml_disable
 	config_add_int eml_resp
 	config_add_string mtk_vendor_element
+	config_add_int disable_rrm
 }
 
 hostapd_set_vlan_file() {
@@ -1508,6 +1509,7 @@ wpa_supplicant_prepare_interface() {
 	_wpa_supplicant_common "$1"
 
 	json_get_vars mode wds multi_ap assoc_phy mld_single_link mld_assoc_phy mld_allowed_phy_bitmap rsn_overriding
+	json_get_vars disable_rrm
 	set_default mld_allowed_phy_bitmap 0
 	set_default rsn_overriding 2
 
@@ -1609,6 +1611,7 @@ ${mld_force_single_link:+mld_force_single_link=$mld_force_single_link}
 ${mld_allowed_phy_bitmap:+mld_allowed_phy=$mld_allowed_phy_bitmap}
 $rsn_overriding_str
 wps_cred_add_sae=1
+${disable_rrm:+disable_rrm=$disable_rrm}
 EOF
 	return 0
 }
