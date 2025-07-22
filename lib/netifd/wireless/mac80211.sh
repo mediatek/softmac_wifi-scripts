@@ -861,8 +861,9 @@ fill_mld_params() {
 		local iface_disabled="$(uci show wireless.$iface | grep "disabled" | cut -d '=' -f2 | tr -d "'")"
 		local ht_mode="$(uci show wireless.$device.htmode | cut -d '=' -f2 | tr -d "'")"
 		local partner_radio_idx="$(uci show wireless.$device.radio | cut -d '=' -f2 | tr -d "'")"
+		local radio_disabled="$(uci show wireless.$device | grep "disabled" | cut -d '=' -f2 | tr -d "'")"
 
-		if [ "$iface_disabled" != "1" ] && [ "$mld_id" = "$target_mld_id" ] && [[ "$ht_mode" == "EHT"* ]]; then
+		if [ "$iface_disabled" != "1" ] && [ "$radio_disabled" != "1" ] && [ "$mld_id" = "$target_mld_id" ] && [[ "$ht_mode" == "EHT"* ]]; then
 			if [ -n "$mld_link_id" ]; then
 				is_mld_link_id_set=1
 				mld_allowed_links=$(($mld_allowed_links + 2**$mld_link_id))
