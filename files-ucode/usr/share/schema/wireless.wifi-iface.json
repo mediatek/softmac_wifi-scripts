@@ -1174,6 +1174,97 @@
 		"wps_pushbutton": {
 			"description": "Support WPS pushbutton",
 			"type": "boolean"
+		},
+		"interworking": {
+			"description": "interworking",
+			"type": "boolean",
+			"default": false
+		},
+		"unsol_bcast_probe_resp_interval": {
+			"description": "unsol_bcast_probe_resp_interval",
+			"type": "number"
+		},
+		"fils_discovery_min_interval": {
+			"description": "fils_discovery_min_interval",
+			"type": "number"
+		},
+		"fils_discovery_max_interval": {
+			"description": "fils_discovery_max_interval",
+			"type": "number"
+		},
+		"rssi_reject_assoc_timeout": {
+			"description": "Association retry delay in seconds allowed by the STA if RSSI has not met the threshold",
+			"type": "number",
+			"minimum": 0,
+			"maximum": 255
+		},
+		"mld_addr": {
+			"description": "AP MLD address",
+			"type": "string"
+		},
+		"beacon_prot": {
+			"description": "Beacon protection",
+			"type": "boolean"
+		},
+		"sae_groups": {
+			"description": "sae_groups",
+			"type": "array",
+			"items": {
+				"type": "number"
+			}
+		},
+		"owe_groups": {
+			"description": "owe_groups",
+			"type": "array",
+			"items": {
+				"type": "number"
+			}
+		},
+		"pairwise": {
+			"description": "pairwise cipher",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"group_cipher": {
+			"description": "Group cipher",
+			"type": "string"
+		},
+		"group_mgmt_cipher": {
+			"type": "alias",
+			"default": "ieee80211w_mgmt_cipher"
+		},
+		"tx_queue_data2_burst": {
+			"description": "set tx_queue_data2_burst for STA",
+			"type": "string",
+			"default": "0"
+		},
+		"disable_ht": {
+			"description": "Disable HT mode for STA",
+			"type": "boolean"
+		},
+		"disable_vht": {
+			"description": "Disable VHT mode for STA",
+			"type": "boolean"
+		},
+		"disable_he": {
+			"description": "Disable HE mode for STA",
+			"type": "boolean"
+		},
+		"disable_eht": {
+			"description": "Disable EHT mode for STA",
+			"type": "boolean"
+		},
+		"rsn_overriding": {
+			"description": "RSN overriding for STA",
+			"type": "number",
+			"enum": [ 0, 1, 2 ],
+			"default": 2
+		},
+		"disable_rrm": {
+			"description": "Disable Radio Resource Management (RRM)",
+			"type": "boolean"
 		}
 	}
 }

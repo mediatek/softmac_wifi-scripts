@@ -30,10 +30,13 @@ function iface_setup(config) {
 
 	config.bridge = config.network_bridge;
 	config.snoop_iface = config.network_ifname;
-	if (!config.wds)
+	if (!config.wds) {
 		config.wds_bridge = null;
-	else
+	} else {
+		if (!config.wds_bridge)
+			config.wds_bridge = config.bridge;
 		config.wds_sta = true;
+	}
 
 	if (!config.idx)
 		append('interface', config.ifname);
@@ -441,7 +444,7 @@ function iface_hs20(config) {
 }
 
 function iface_interworking(config) {
-	if (!config.iw_enabled)
+	if (!config.iw_enabled && !config.interworking)
 		return;
 	
 	config.interworking = true;
@@ -457,6 +460,23 @@ function iface_interworking(config) {
 		'venue_type', 'network_auth_type', 'gas_address3', 'roaming_consortium', 'anqp_elem', 'nai_realm',
 		'venue_name', 'venue_url', 'domain_name', 'anqp_3gpp_cell_net',
 	]);
+}
+
+function iface_mtk_options(config) {
+	append_vars(config, [ 'unsol_bcast_probe_resp_interval' ,
+			      'fils_discovery_min_interval',
+			      'fils_discovery_max_interval',
+			      'rssi_reject_assoc_timeout',
+			      'rnr', 'mld_addr', 'group_cipher' ]);
+
+	if (config.ieee80211w)
+		append_vars(config, [ 'beacon_prot' ]);
+
+	if (config.auth_type in [ 'sae', 'psk-sae', 'sae-ext', 'psk-sae-ext' ])
+		append_vars(config, [ 'sae_groups' ]);
+
+	if (config.auth_type in [ 'owe' ])
+		append_vars(config, [ 'owe_groups' ]);
 }
 
 export function generate(interface, data, config, vlans, stas, phy_features) {
@@ -537,6 +557,8 @@ export function generate(interface, data, config, vlans, stas, phy_features) {
 	/* raw options */
 	for (let raw in config.hostapd_bss_options)
 		append_raw(raw);
+
+	iface_mtk_options(config);
 
 	if (config.mlo) {
 		append_raw('mld_ap=1');

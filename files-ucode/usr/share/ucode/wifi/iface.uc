@@ -105,6 +105,10 @@ export function parse_encryption(config, dev_config) {
 			break;
 		}
 
+		if (config.mode == 'sta') {
+			config.wpa_pairwise = "CCMP CCMP-256 GCMP GCMP-256";
+		}
+
 		if (!wpa3_pairwise)
 			break;
 
@@ -115,6 +119,8 @@ export function parse_encryption(config, dev_config) {
 		break;
 	}
 
+	if (config.pairwise)
+		config.wpa_pairwise = config.pairwise;
 };
 
 export function wpa_key_mgmt(config) {
