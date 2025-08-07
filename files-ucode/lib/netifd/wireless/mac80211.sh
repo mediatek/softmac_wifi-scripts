@@ -301,7 +301,14 @@ function setup() {
 
 	netifd.set_up();
 
-	return 0
+	system(`echo "${data.config.sr_enable}" > /sys/kernel/debug/ieee80211/phy0/mt76/band${data.config.radio}/sr_enable`);
+	system(`echo "${data.config.sr_enhanced}" > /sys/kernel/debug/ieee80211/phy0/mt76/band${data.config.radio}/sr_enhanced_enable`);
+
+	log(`Setup SMP Affinity`);
+	system(`/sbin/smp-mt76.sh`);
+	system(`echo /tmp/%e.core > /proc/sys/kernel/core_pattern`);
+
+	return 0;
 }
 
 function teardown() {

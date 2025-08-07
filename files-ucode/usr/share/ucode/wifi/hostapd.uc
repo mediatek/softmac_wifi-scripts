@@ -308,6 +308,13 @@ function device_htmode_append(config) {
 		set_default(config, 'tx_queue_data2_burst', '2.0');
 
 		let vht_capab = phy_capabilities.vht_capa;
+
+		if (!config.etxbfen) {
+			config.su_beamformer = false;
+			config.su_beamformee = false;
+			config.mu_beamformer = false;
+			config.mu_beamformee = false;
+		}
 		
 		config.vht_capab = '';
 		if (vht_capab & 0x10 && config.rxldpc)
@@ -411,6 +418,12 @@ function device_htmode_append(config) {
 		if (!(he_mac_cap[0] & 0x1))
 			config.he_twt_required= false;
 
+		if (!config.etxbfen) {
+			config.he_su_beamformer = false;
+			config.he_su_beamformee = false;
+			config.he_mu_beamformer = false;
+		}
+
 		append_vars(config, [
 			'ieee80211ax', 'he_oper_chwidth', 'he_oper_centr_freq_seg0_idx',
 			'he_su_beamformer', 'he_su_beamformee', 'he_mu_beamformer', 'he_twt_required',
@@ -430,6 +443,13 @@ function device_htmode_append(config) {
 		config.ieee80211be = true;
 		append_vars(config, [ 'ieee80211be' ]);
 
+		if (!config.etxbfen) {
+			config.eht_su_beamformer = false;
+			config.eht_su_beamformee = false;
+			config.eht_mu_beamformer = false;
+		}
+
+		append_vars(config, [ 'eht_su_beamformer', 'eht_su_beamformee', 'eht_mu_beamformer' ]);
 		if (config.hw_mode == 'a')
 			append_vars(config, [ 'eht_oper_chwidth', 'eht_oper_centr_freq_seg0_idx' ]);
 	}
@@ -458,6 +478,20 @@ function device_capabilities(config) {
 
 	phy_features.ftm_responder = device_extended_features(phy.extended_features, NL80211_EXT_FEATURE_ENABLE_FTM_RESPONDER);
 	phy_features.radar_background = device_extended_features(phy.extended_features, NL80211_EXT_FEATURE_RADAR_BACKGROUND);
+}
+
+function device_mtk_options(config) {
+	append_vars(config, [ 'pp_mode', 'eml_disable', 'eml_resp', 'mu_onoff',
+			      'background_cert_mode', 'he_twt_responder', 'lpi_psd',
+			      'lpi_bcn_enhance', 'sku_idx', 'lpi_sku_idx' ]);
+
+	append('ibf_enable', config.itxbfen);
+
+	if (config.pp_mode == 2)
+		append('punct_bitmap', config.pp_bitmap);
+
+	if (config.ht_coex)
+		append_vars(config, [ 'obss_interval' ]);
 }
 
 function generate(config) {
@@ -522,6 +556,9 @@ function generate(config) {
 	/* raw options */
 	for (let raw in config.hostapd_options)
 		append_raw(raw);
+
+	/* MTK internal options */
+	device_mtk_options(config);
 }
 
 let iface_idx = 0;

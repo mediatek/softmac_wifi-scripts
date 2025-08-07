@@ -76,7 +76,7 @@
 		"beamformee_antennas": {
 			"description": "Beamformee antenna override",
 			"type": "number",
-			"default": 4
+			"default": 5
 		},
 		"beamformer_antennas": {
 			"description": "Beamformer antenna override",
@@ -744,6 +744,98 @@
 			"description": "VHT TXOP PS mode",
 			"type": "boolean",
 			"default": true
+		},
+		"pp_mode": {
+			"description": "PP mode. 0: disabled, 1: FW mode, 2: user mode",
+			"type": "number",
+			"minimum": 0,
+			"maximum": 2
+		},
+		"pp_bitmap": {
+			"description": "PP bitmap",
+			"type": "number"
+		},
+		"eml_disable": {
+			"description": "eml_disable",
+			"type": "boolean"
+		},
+		"eml_resp": {
+			"description": "eml_resp",
+			"type": "boolean"
+		},
+		"mu_onoff": {
+			"description": "mu_onoff",
+			"type": "boolean"
+		},
+		"sr_enable": {
+			"description": "sr_enable",
+			"type": "number",
+			"default": 1,
+			"enum": [0, 1]
+		},
+		"sr_enhanced": {
+			"description": "sr_enhanced",
+			"type": "number",
+			"default": 1,
+			"enum": [0, 1]
+		},
+		"obss_interval": {
+			"description": "obss_interval",
+			"type": "number",
+			"default": 300
+		},
+		"background_cert_mode": {
+			"description": "background_cert_mode",
+			"type": "boolean"
+		},
+		"he_twt_responder": {
+			"description": "he_twt_responder",
+			"type": "boolean"
+		},
+		"eht_su_beamformee": {
+			"description": "",
+			"type": "boolean",
+			"default": true
+		},
+		"eht_su_beamformer": {
+			"description": "",
+			"type": "boolean",
+			"default": true
+		},
+		"eht_mu_beamformer": {
+			"description": "EHT multiple user beamformer support",
+			"type": "boolean",
+			"default": true
+		},
+		"etxbfen": {
+			"description": "etxbfen",
+			"type": "boolean",
+			"default": true
+		},
+		"itxbfen": {
+			"description": "itxbfen",
+			"type": "boolean",
+			"default": false
+		},
+		"lpi_psd": {
+			"description": "LPI PSD control",
+			"type": "boolean"
+		},
+		"lpi_bcn_enhance": {
+			"description": "LPI beacon duplicated enhancement",
+			"type": "boolean"
+		},
+		"sku_idx": {
+			"description": "SKU index",
+			"type": "number",
+			"minimum": 0,
+			"maximum": 255
+		},
+		"lpi_sku_idx": {
+			"description": "LPI SKU index",
+			"type": "number",
+			"minimum": 0,
+			"maximum": 255
 		}
 	}
 }
