@@ -355,9 +355,9 @@
 			"type": "string",
 			"enum": [
 				"NOHT", "HT20", "HT40-", "HT40+", "HT40",
-				"VHT20", "VHT40", "VHT80", "VHT160",
-				"HE20", "HE40", "HE80", "HE160",
-				"EHT20", "EHT40", "EHT80", "EHT160", "EHT320" ]
+				"VHT20", "VHT40", "VHT40-", "VHT40+", "VHT80", "VHT160",
+				"HE20", "HE40", "HE40-", "HE40+", "HE80", "HE160",
+				"EHT20", "EHT40", "EHT40-", "EHT40+", "EHT80", "EHT160", "EHT320", "EHT320-1", "EHT320-2" ]
 		},
 		"hwmode": {
 			"type": "alias",
@@ -836,6 +836,10 @@
 			"type": "number",
 			"minimum": 0,
 			"maximum": 255
+		},
+		"eht_bw320_offset": {
+			"description": "EHT BW320 offset",
+			"type": "number"
 		}
 	}
 }

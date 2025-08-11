@@ -154,7 +154,7 @@ function device_htmode_append(config) {
 			config.ieee80211n = 1;
 			config.ht_capab = '';
 		}
-		if (config.htmode in [ 'HT40', 'HT40+', 'HT40-', 'VHT40', 'VHT80', 'VHT160', 'HE40', 'HE80', 'HE160', 'EHT40', 'EHT80', 'EHT160' ]) {
+		if (config.htmode in [ 'HT40', 'HT40+', 'HT40-', 'VHT40', 'VHT40+', 'VHT40-', 'VHT80', 'VHT160', 'HE40', 'HE40+', 'HE40-', 'HE80', 'HE160', 'EHT40', 'EHT40+', 'EHT40-', 'EHT80', 'EHT160' ]) {
 			config.ieee80211n = 1;
 			if (!config.channel)
 				config.ht_capab = '[HT40+]';
@@ -175,8 +175,17 @@ function device_htmode_append(config) {
 				default:
 					switch (config.htmode) {
 					case 'HT40+':
+					case 'VHT40+':
+					case 'HE40+':
+					case 'EHT40+':
+						config.ht_capab = '[HT40+]';
+						break;
+
 					case 'HT40-':
-						config.ht_capab = '[' + config.htmode + ']';
+					case 'VHT40-':
+					case 'HE40-':
+					case 'EHT40-':
+						config.ht_capab = '[HT40-]';
 						break;
 
 					default:
@@ -241,6 +250,9 @@ function device_htmode_append(config) {
 	case 'VHT160':
 	case 'HE160':
 	case 'EHT160':
+	case 'EHT320':
+	case 'EHT320-1':
+	case 'EHT320-2':
 		let vht_oper_centr_freq_seg0_idx_map = [[ 64, 50 ], [ 128, 114 ], [ 177, 163 ]];
 		if (config.band == '6g')
 			vht_oper_centr_freq_seg0_idx_map = [
@@ -272,9 +284,17 @@ function device_htmode_append(config) {
 			break;
 
 		case 'EHT320':
+		case 'EHT320-1':
+		case 'EHT320-2':
 			let eht_center_seg0_map = [
-				[ 61, 31 ], [ 125, 95 ], [ 189, 159 ], [ 221, 191 ]
+				[ 61, 31 ], [ 125, 95 ], [ 189, 159 ]
 			];
+
+			if (config.htmode == 'EHT320-2' || (config.htmode == 'EHT320' && config.channel > 189)) {
+				eht_center_seg0_map = [
+					[ 93, 63 ], [ 157, 127 ], [ 221, 191 ]
+				];
+			}
 
 			for (let k, v in eht_center_seg0_map)
 				if (config.channel <= v[0]) {
@@ -282,7 +302,22 @@ function device_htmode_append(config) {
 					break;
 				}
 			config.op_class = 137;
-			config.eht_oper_chwidth = 7;
+			config.eht_oper_chwidth = 9;
+
+			switch(config.htmode) {
+				case 'EHT320':
+					config.eht_bw320_offset = 0;
+					break;
+
+				case 'EHT320-1':
+					config.eht_bw320_offset = 1;
+					break;
+
+				case 'EHT320-2':
+					config.eht_bw320_offset = 1;
+					break;
+
+			}
 			break;
 
 		case 'HE40':
@@ -452,6 +487,11 @@ function device_htmode_append(config) {
 		append_vars(config, [ 'eht_su_beamformer', 'eht_su_beamformee', 'eht_mu_beamformer' ]);
 		if (config.hw_mode == 'a')
 			append_vars(config, [ 'eht_oper_chwidth', 'eht_oper_centr_freq_seg0_idx' ]);
+
+		if (config.band == "6g") {
+			config.stationary_ap = true;
+			append_vars(config, [ 'he_6ghz_reg_pwr_type', 'eht_bw320_offset']);
+		}
 	}
 
 	append_vars(config, [ 'tx_queue_data2_burst', 'stationary_ap' ]);
