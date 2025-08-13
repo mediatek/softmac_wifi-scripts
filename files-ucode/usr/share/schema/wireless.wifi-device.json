@@ -195,7 +195,7 @@
 		},
 		"he_mu_edca_ac_be_aifsn": {
 			"type": "number",
-			"default": 8
+			"default": 0
 		},
 		"he_mu_edca_ac_be_ecwmax": {
 			"type": "number",
@@ -207,7 +207,7 @@
 		},
 		"he_mu_edca_ac_be_timer": {
 			"type": "number",
-			"default": 255
+			"default": 3
 		},
 		"he_mu_edca_ac_bk_aci": {
 			"type": "number",
@@ -215,7 +215,7 @@
 		},
 		"he_mu_edca_ac_bk_aifsn": {
 			"type": "number",
-			"default": 15
+			"default": 0
 		},
 		"he_mu_edca_ac_bk_ecwmax": {
 			"type": "number",
@@ -227,7 +227,7 @@
 		},
 		"he_mu_edca_ac_bk_timer": {
 			"type": "number",
-			"default": 255
+			"default": 3
 		},
 		"he_mu_edca_ac_vi_aci": {
 			"type": "number",
@@ -235,7 +235,7 @@
 		},
 		"he_mu_edca_ac_vi_aifsn": {
 			"type": "number",
-			"default": 5
+			"default": 0
 		},
 		"he_mu_edca_ac_vi_ecwmax": {
 			"type": "number",
@@ -247,7 +247,7 @@
 		},
 		"he_mu_edca_ac_vi_timer": {
 			"type": "number",
-			"default": 255
+			"default": 3
 		},
 		"he_mu_edca_ac_vo_aci": {
 			"type": "number",
@@ -255,7 +255,7 @@
 		},
 		"he_mu_edca_ac_vo_aifsn": {
 			"type": "number",
-			"default": 5
+			"default": 0
 		},
 		"he_mu_edca_ac_vo_ecwmax": {
 			"type": "number",
@@ -267,7 +267,7 @@
 		},
 		"he_mu_edca_ac_vo_timer": {
 			"type": "number",
-			"default": 255
+			"default": 3
 		},
 		"he_mu_edca_qos_info_param_count": {
 			"type": "number",
