@@ -144,6 +144,18 @@ function device_rates(config) {
 	append_vars(config, [ 'beacon_rate', 'supported_rates', 'basic_rates' ]);
 }
 
+function he_bss_color_random() {
+	let f = fs.open("/dev/urandom", "r");
+
+	if (!f)
+		return -1;
+
+	let color = (ord(f.read(1)) % 63) + 1;
+	f.close();
+
+	return color;
+}
+
 function device_htmode_append(config) {
 	config.channel_offset = config.band == '6g' ? 1 : 0;
 
@@ -439,6 +451,12 @@ function device_htmode_append(config) {
 				config.he_spr_sr_control |= 1 << 2;
 			if (!config.he_spr_psr_enabled)
 				config.he_spr_sr_control |= 1;
+			if (!config.he_bss_color)
+				config.he_bss_color = he_bss_color_random();
+
+			if (config.he_bss_coolor == -1)
+				delete config.he_bss_color;
+
 			append_vars(config, [ 'he_bss_color', 'he_spr_non_srg_obss_pd_max_offset', 'he_spr_sr_control' ]);
 		}
 

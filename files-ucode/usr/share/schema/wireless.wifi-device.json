@@ -170,8 +170,7 @@
 			"description": "BSS color to be announced",
 			"type": "number",
 			"minimum": 1,
-			"maximum": 128,
-			"default": 128
+			"maximum": 63
 		},
 		"he_bss_color_enabled": {
 			"description": "Enable BSS color",
