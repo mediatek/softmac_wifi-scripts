@@ -219,18 +219,21 @@ function __iface_pending_next(pending, state, ret, data)
 		if (!iface_add(phy, config))
 			hostapd.printf(`hostapd.add_iface failed for phy ${phy} ifname=${bss.ifname}`);
 		let iface = hostapd.interfaces[phy];
-		if (!bss.mld_ap) {
-			pending.call("wpa_supplicant", "phy_set_state", {
-				phy: phydev.phy,
-				radio: phydev.radio ?? -1,
-				stop: false
-			});
-		} else if (!iface || iface.is_mld_finished()) {
-			pending.call("wpa_supplicant", "phy_set_state", {
-				phy: "phy0",
-				radio: 0,
-				stop: false
-			});
+		if (!iface || iface.get_finished_radio_mask() == config.used_radio_mask) {
+			let radio_idx = 0, radio_mask = iface.get_radio_mask();
+
+			while (radio_mask) {
+				if (radio_mask & 1) {
+					pending.call("wpa_supplicant", "phy_set_state", {
+						phy: "phy0",
+						radio: radio_idx,
+						stop: false
+					});
+				}
+
+				radio_idx++;
+				radio_mask >>= 1;
+			}
 		}
 		return null;
 	case "done":
@@ -770,6 +773,9 @@ function iface_load_config(phy, radio, filename)
 		if (val[0] == "#num_global_macaddr" ||
 		    val[0] == "mbssid")
 			config[substr(val[0], 1)] = int(val[1]);
+
+		if (val[0] == "#used_radio_mask")
+			config["used_radio_mask"] = int(val[1]);
 
 		push(config.radio.data, line);
 	}

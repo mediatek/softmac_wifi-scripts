@@ -662,6 +662,7 @@ ${lpi_bcn_enhance:+lpi_bcn_enhance=$lpi_bcn_enhance}
 ${sku_idx:+sku_idx=$sku_idx}
 ${lpi_sku_idx:+lpi_sku_idx=$lpi_sku_idx}
 #num_global_macaddr=$num_global_macaddr
+#used_radio_mask=$used_radio_mask
 $base_cfg
 
 EOF
@@ -1406,6 +1407,37 @@ mac80211_set_suffix() {
 	set_default radio -1
 }
 
+mac80211_count_ap_radio() {
+	local radio
+	local iface
+
+	for radio in $(uci show wireless | grep '=wifi-device' | cut -d. -f2 | cut -d= -f1); do
+		local radio_disabled=$(uci get wireless.$radio.disabled 2>/dev/null)
+		# skip disabled radios
+		[ "$radio_disabled" = "1" ] && continue
+
+		# Check for at least one enabled AP iface on this radio
+		for iface in $(uci show wireless | grep '=wifi-iface' | cut -d. -f2 | cut -d= -f1); do
+			local iface_device=$(uci get wireless.$iface.device 2>/dev/null)
+			# skip mismatched wifi-iface
+			[ "$iface_device" != "$radio" ] && continue
+
+			local iface_disabled=$(uci get wireless.$iface.disabled 2>/dev/null)
+			# skip disabled wifi-iface
+			[ "$iface_disabled" = "1" ] && continue
+
+			iface_mode=$(uci get wireless.$iface.mode 2>/dev/null)
+			[ "$iface_mode" = "ap" ] && {
+				# Extract the radio index (e.g., radio0 -> 0)
+				local idx=$(echo "$radio" | sed 's/[^0-9]*//g')
+
+				used_radio_mask=$((used_radio_mask | (1 << idx)))
+				break
+			}
+		done
+	done
+}
+
 mac80211_count_ap() {
 	total_num_ap=$(($total_num_ap + 1))
 }
@@ -1564,6 +1596,9 @@ drv_mac80211_setup() {
 	wpa_supp_init=
 	for_each_interface "ap" mac80211_check_ap
 
+	used_radio_mask=0
+	mac80211_count_ap_radio
+
 	[ -f "$hostapd_conf_file" ] && mv "$hostapd_conf_file" "$hostapd_conf_file.prev"
 
 	for_each_interface "sta adhoc mesh" mac80211_set_noscan
@@ -1598,7 +1633,7 @@ drv_mac80211_setup() {
 	[ -x /usr/sbin/wpa_supplicant ] && wpa_supplicant_set_config "$phy" "$radio"
 	[ -x /usr/sbin/hostapd ] && hostapd_set_config "$phy" "$radio"
 
-	[ -x /usr/sbin/wpa_supplicant ] && [ -z "$hostapd_ctrl" ] && wpa_supplicant_start "$phy" "$radio"
+	[ -x /usr/sbin/wpa_supplicant ] && [ "$used_radio_mask" -eq 0 ] && wpa_supplicant_start "$phy" "$radio"
 
 	json_set_namespace wdev_uc prev
 	wdev_tool "$phy$phy_suffix" set_config "$(json_dump)" $active_ifnames
