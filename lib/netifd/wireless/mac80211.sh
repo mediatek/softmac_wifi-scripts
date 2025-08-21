@@ -100,7 +100,6 @@ drv_mac80211_init_iface_config() {
 	config_add_int max_listen_int
 	config_add_int dtim_period
 	config_add_int start_disabled
-	config_add_int vif_txpower
 
 	# mesh
 	config_add_string mesh_id
@@ -1187,22 +1186,6 @@ mac80211_setup_monitor() {
 	json_set_namespace "$prev"
 }
 
-mac80211_set_vif_txpower() {
-	local name="$1"
-
-	json_select config
-	json_get_var ifname _ifname
-	json_get_vars vif_txpower
-	json_select ..
-
-	set_default vif_txpower "$txpower"
-	if [ -n "$vif_txpower" ]; then
-		iw dev "$ifname" set txpower fixed "${vif_txpower%%.*}00"
-	else
-		iw dev "$ifname" set txpower auto
-	fi
-}
-
 wpa_supplicant_init_config() {
 	json_set_namespace wpa_supp prev
 
@@ -1621,15 +1604,12 @@ drv_mac80211_setup() {
 	wdev_tool "$phy$phy_suffix" set_config "$(json_dump)" $active_ifnames
 	json_set_namespace "$prev"
 
-	[ -z "$phy_suffix" ] && {
-		if [ -n "$txpower" ]; then
-			iw phy "$phy" set txpower fixed "${txpower%%.*}00"
-		else
-			iw phy "$phy" set txpower auto
-		fi
-	}
+	if [ -n "$txpower" ]; then
+		iw phy "$phy" set txpower fixed "${txpower%%.*}00" radio "$radio"
+	else
+		iw phy "$phy" set txpower auto radio "$radio"
+	fi
 
-	for_each_interface "ap sta adhoc mesh monitor" mac80211_set_vif_txpower
 	wireless_set_up
 
 	echo /tmp/%e.core > /proc/sys/kernel/core_pattern
