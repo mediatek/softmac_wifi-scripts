@@ -1554,7 +1554,7 @@ wpa_supplicant_prepare_interface() {
 	}
 
 	if !([ "$mld_allowed_phy_bitmap" -ge 0 ] && [ "$mld_allowed_phy_bitmap" -le 7 ]); then
-		echo "Error: Invalid MLD allowed phy: ${mld_allowed_phy_bitmap}"
+		echo "error: Invalid MLD allowed phy: ${mld_allowed_phy_bitmap}"
 		return 1
 	fi
 
@@ -1563,7 +1563,12 @@ wpa_supplicant_prepare_interface() {
 	local mld_connect_band_pref=
 	if [ -n "$mld_assoc_phy" ]; then
 		if [ $(($mld_allowed_phy_bitmap & $((1<<$mld_assoc_phy)))) -eq 0 ]; then
-			echo "Error: Conflict between preferred association phy and allowed phy"
+			echo "error: Conflict between preferred association phy and allowed phy"
+			return 1
+		fi
+
+		if [ $(($mld_allowed_phy_bitmap & $((1<<$radio)))) -eq 0 ]; then
+			echo "error: Conflict between UCI setup phy and allowed phy"
 			return 1
 		fi
 

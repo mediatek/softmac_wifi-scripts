@@ -1346,7 +1346,11 @@ mac80211_setup_vif() {
 	esac
 
 	json_select ..
-	[ -n "$failed" ] || wireless_add_vif "$name" "$ifname"
+	if [ -n "$failed" ]; then
+		echo "error: $ifname failed to setup"
+	else
+		wireless_add_vif "$name" "$ifname"
+	fi
 
 	echo "Setup SMP Affinity"
 	/sbin/smp-mt76.sh
