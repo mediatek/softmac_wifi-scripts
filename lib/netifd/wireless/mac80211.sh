@@ -851,6 +851,7 @@ fill_mld_params() {
 	local is_primary=1
 	local mld_allowed_links=0
 	local mld_radio_mask=0
+	local mld_link_cnt=0
 
 	iface_list="$(cat /etc/config/wireless | grep wifi-iface | cut -d ' ' -f3 | tr -s "'\n" ' ')"
 	for iface in $iface_list
@@ -873,6 +874,8 @@ fill_mld_params() {
 			else
 				mld_allowed_links=$(($mld_allowed_links * 2 + 1))
 			fi
+
+			mld_link_cnt=$(($mld_link_cnt + 1))
 
 			[ $partner_radio_idx -lt $own_radio_idx ] && is_primary=0
 			mld_radio_mask=$(($mld_radio_mask + 2**$partner_radio_idx))
@@ -901,6 +904,11 @@ fill_mld_params() {
 
 	if [ $found_mld -eq 0 ]; then
 		echo "mld_id $target_mld_id is not found"
+		return 1
+	fi
+
+	if [ $mld_link_cnt -gt 3 ]; then
+		echo "mld_link_cnt $mld_link_cnt is invalid"
 		return 1
 	fi
 
