@@ -1265,6 +1265,15 @@
 		"disable_rrm": {
 			"description": "Disable Radio Resource Management (RRM)",
 			"type": "boolean"
+		},
+		"mtk_vendor_element": {
+			"description": "Configuration for MTK vendor element in association request",
+			"type": "string"
+		},
+		"assocresp_elements": {
+			"description": "Configuration for MTK vendor element in association response",
+			"type": "string",
+			"default": "dd07000ce700000000"
 		}
 	}
 }
