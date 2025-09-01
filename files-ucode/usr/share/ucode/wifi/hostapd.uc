@@ -75,7 +75,7 @@ function device_country_code(config) {
 	if (!exists(config, 'country_code'))
 		return;
 
-	if (config.hw_mode != 'a')
+	if (config.hw_mode != 'a' || config.band != '5g')
 		delete config.ieee80211h;
 	append_vars(config, [ 'country_code', 'country3', 'ieee80211h' ]);
 	if (config.ieee80211d)
