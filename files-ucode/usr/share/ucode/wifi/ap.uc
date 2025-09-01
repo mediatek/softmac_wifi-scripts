@@ -233,6 +233,9 @@ function iface_wps(config) {
 			'ap_pin', 'ap_setup_locked', 'upnp_iface'
 		]);
 	}
+
+	if (config.wps_pushbutton)
+		append_raw('wps_cred_add_sae=1');
 }
 
 function iface_rrm(config) {
