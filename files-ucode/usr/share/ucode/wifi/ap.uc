@@ -130,7 +130,11 @@ function iface_auth_type(config) {
 			iface_authentication_server(config);
 			config.macaddr_acl = 2;
 			config.wpa_psk_radius = 2;
-		} else if (length(config.key) == 64) {
+		} else if (length(config.key) == 64 && config.auth_type != 'psk-sae') {
+			/* QT verifies that password length should not
+			 * be greater than 63 characters in WPA3-Personal
+			 * transition mode.
+			 */
 			config.wpa_psk = key;
 		} else if (length(config.key) >= 8 && length(config.key) <= 63) {
 			config.wpa_passphrase = config.key;
