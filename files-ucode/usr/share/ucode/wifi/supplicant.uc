@@ -62,6 +62,7 @@ export function ratelist(rates) {
 
 function sta_global_mtk_options(config) {
 	append_vars(config, [ 'tx_queue_data2_burst', 'rsn_overriding', 'disable_rrm' ]);
+	append_raw('wps_cred_add_sae=1');
 
 	if (config.auth_type in [ 'sae', 'psk-sae' ])
 		append_vars(config, [ 'sae_groups', 'sae_pwe' ]);
