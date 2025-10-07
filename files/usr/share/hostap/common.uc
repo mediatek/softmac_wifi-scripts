@@ -105,6 +105,8 @@ function wdev_create(phy, name, data)
 		req.vif_radio_mask = data.radio_mask;
 	else if (data.radio != null && data.radio >= 0)
 		req.vif_radio_mask = 1 << data.radio;
+	else if (data.mld_radio_mask != null && data.mld_radio_mask > 0)
+		req.vif_radio_mask = data.mld_radio_mask;
 
 	nl80211.error();
 
