@@ -57,6 +57,14 @@ export function parse_encryption(config, dev_config) {
 		config.auth_type = 'psk-sae';
 		break;
 
+	case 'sae-ext':
+		config.auth_type = 'sae-ext';
+		break;
+
+	case 'sae-ext-mixed':
+		config.auth_type = 'psk-sae-ext';
+		break;
+
 	case 'wpa':
 	case 'wpa2':
 	case 'wpa-mixed':
@@ -100,7 +108,7 @@ export function parse_encryption(config, dev_config) {
 		break;
 
 	default:
-		if (config.encryption == 'wpa3-192') {
+		if (config.encryption == 'wpa3-192' || config.encryption == 'sae-ext') {
 			config.wpa_pairwise = 'GCMP-256';
 			break;
 		}
@@ -195,6 +203,22 @@ export function wpa_key_mgmt(config) {
 			append_value(config, 'wpa_key_mgmt', 'WPA-PSK-SHA256');
 		if (config.ieee80211r)
 			append_value(config, 'wpa_key_mgmt', 'FT-PSK');
+		break;
+
+	case 'sae-ext':
+		append_value(config, 'wpa_key_mgmt', 'SAE-EXT-KEY');
+		if (config.ieee80211r)
+			append_value(config, 'wpa_key_mgmt', 'FT-SAE-EXT-KEY');
+		break;
+
+	case 'psk-sae-ext':
+		append_value(config, 'wpa_key_mgmt', 'SAE-EXT-KEY');
+		if (config.ieee80211w)
+			append_value(config, 'wpa_key_mgmt', 'WPA-PSK-SHA256');
+		if (config.ieee80211r)
+			append_value(config, 'wpa_key_mgmt', 'FT-PSK');
+
+		append_value(config, 'wpa_key_mgmt', 'WPA-PSK');
 		break;
 
 	case 'owe':

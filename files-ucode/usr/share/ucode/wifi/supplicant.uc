@@ -78,9 +78,9 @@ function sta_network_mtk_options(config) {
 function setup_sta(data, config) {
 	iface.parse_encryption(config);
 
-	if (config.auth_type in [ 'sae', 'owe', 'eap2', 'eap192' ])
+	if (config.auth_type in [ 'sae', 'sae-ext', 'owe', 'eap2', 'eap192' ])
 		config.ieee80211w = 2;
-	else if (config.auth_type in [ 'psk-sae' ])
+	else if (config.auth_type in [ 'psk-sae', 'psk-sae-ext' ])
 		config.ieee80211w = 1;
 	if ((wildcard(data.htmode, 'EHT*') || wildcard(data.htmode, 'HE*')) &&
 		config.rsn_override)
@@ -149,7 +149,9 @@ function setup_sta(data, config) {
 	case 'psk':
 	case 'psk2':
 	case 'sae':
+	case 'sae-ext':
 	case 'psk-sae':
+	case 'psk-sae-ext':
 		if (config.mode != 'mesh')
 			iface.wpa_key_mgmt(config);
 
