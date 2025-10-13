@@ -543,7 +543,9 @@ export function generate(interface, data, config, vlans, stas, phy_features) {
 		'wpa_key_mgmt',
 	]);
 
-	if (config.rsn_override_key_mgmt || config.rsn_override_pairwise) {
+	/* 6G band does not need RSN override */
+	if (config.rsn_override > 0 && data.config.band != '6g' &&
+	    (config.rsn_override_key_mgmt || config.rsn_override_pairwise)) {
 		config.rsn_override_mfp ??= config.ieee80211w;
 		config.rsn_override_key_mgmt ??= config.wpa_key_mgmt;
 		config.rsn_override_pairwise ??= config.wpa_pairwise;
@@ -552,18 +554,19 @@ export function generate(interface, data, config, vlans, stas, phy_features) {
 			'rsn_override_pairwise',
 			'rsn_override_mfp'
 		]);
+	}
 
-		if (config.mlo) {
-			config.rsn_override_mfp_2 ??= config.rsn_override_mfp;
-			config.rsn_override_key_mgmt_2 ??= config.rsn_override_key_mgmt;
-			config.rsn_override_pairwise_2 ??= config.rsn_override_pairwise;
-
-			append_vars(config, [
-				'rsn_override_key_mgmt_2',
-				'rsn_override_pairwise_2',
-				'rsn_override_mfp_2'
-			]);
-		}
+	/* MLO needs RSN override 2 */
+	if (config.rsn_override > 0 &&
+	    (config.rsn_override_key_mgmt_2 || config.rsn_override_pairwise_2)) {
+		config.rsn_override_mfp_2 = 2;
+		config.rsn_override_key_mgmt_2 ??= config.wpa_key_mgmt;
+		config.rsn_override_pairwise_2 ??= config.wpa_pairwise;
+		append_vars(config, [
+			'rsn_override_key_mgmt_2',
+			'rsn_override_pairwise_2',
+			'rsn_override_mfp_2'
+		]);
 	}
 
 	/* raw options */
