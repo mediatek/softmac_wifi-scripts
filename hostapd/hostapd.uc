@@ -982,6 +982,24 @@ function iface_load_config(phy, radio, filename)
 	}
 	f.close();
 
+	let first_mld_bss = 0;
+	for (first_mld_bss = 0; first_mld_bss < length(config.bss); first_mld_bss++) {
+		if (config.bss[first_mld_bss].mld_ap == 1)
+			break;
+	}
+
+	if (length(config.bss) > 1 && config.bss[0].mld_ap != 1 &&
+	    first_mld_bss != length(config.bss)) {
+		let tmp_bss = config.bss[0];
+		config.bss[0] = config.bss[first_mld_bss];
+		config.bss[first_mld_bss] = tmp_bss;
+
+		let tmp_bssid = config.bss[0].bssid;
+		config.bss[0].bssid = config.bss[first_mld_bss].bssid;
+		config.bss[first_mld_bss].bssid = tmp_bssid;
+		hostapd.printf(`mtk: ucode: switch bss[${first_mld_bss}] to first`);
+	}
+
 	return config;
 }
 
