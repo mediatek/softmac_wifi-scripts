@@ -64,7 +64,7 @@ function sta_global_mtk_options(config) {
 	append_vars(config, [ 'tx_queue_data2_burst', 'rsn_overriding', 'disable_rrm', 'mld_force_single_link' ]);
 	append_raw('wps_cred_add_sae=1');
 
-	if (config.auth_type in [ 'sae', 'psk-sae' ])
+	if (config.auth_type in [ 'sae', 'psk-sae', 'sae-ext' ])
 		append_vars(config, [ 'sae_groups', 'sae_pwe' ]);
 
 	if (!config.mlo)
@@ -105,7 +105,7 @@ function sta_network_mtk_options(config) {
 function setup_sta(data, config) {
 	iface.parse_encryption(config, data);
 
-	if (config.auth_type in [ 'sae', 'owe', 'eap2', 'eap192', 'dpp' ])
+	if (config.auth_type in [ 'sae', 'sae-ext', 'owe', 'eap2', 'eap192', 'dpp' ])
 		config.ieee80211w = 2;
 	else if (config.auth_type in [ 'psk-sae' ] && !config.ieee80211w)
 		config.ieee80211w = 1;
@@ -180,6 +180,7 @@ function setup_sta(data, config) {
 	case 'psk':
 	case 'psk2':
 	case 'sae':
+	case 'sae-ext':
 	case 'psk-sae':
 		if (config.mode != 'mesh')
 			iface.wpa_key_mgmt(config);

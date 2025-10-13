@@ -93,7 +93,7 @@ function iface_accounting_server(config) {
 }
 
 function iface_auth_type(config, band) {
-	if (config.auth_type in [ 'sae', 'owe', 'eap2', 'eap192', 'dpp' ])
+	if (config.auth_type in [ 'sae', 'sae-ext', 'owe', 'eap2', 'eap192', 'dpp' ])
 		config.ieee80211w = 2;
 
 	if (config.auth_type in [ 'psk-sae', 'eap-eap2' ])
@@ -156,6 +156,7 @@ function iface_auth_type(config, band) {
 	case 'sae':
 	case 'psk-sae':
 	case 'psk-sae-compat':
+	case 'sae-ext':
 		config.vlan_possible = 1;
 		config.wps_possible = 1;
 
@@ -236,7 +237,7 @@ function iface_auth_type(config, band) {
 }
 
 function iface_ppsk(config) {
-	if (!(config.auth_type in [ 'none', 'owe', 'psk', 'sae', 'psk-sae', 'psk-sae-compat', 'wep' ]) || !config.auth_server_addr)
+	if (!(config.auth_type in [ 'none', 'owe', 'psk', 'sae', 'psk-sae', 'psk-sae-compat', 'sae-ext', 'wep' ]) || !config.auth_server_addr)
 		return;
 
 	iface_authentication_server(config);
@@ -522,7 +523,7 @@ function iface_key_caching(config) {
 			'rsn_preauth', 'rsn_preauth_interfaces'
 		]);
 	} else {
-		set_default(config, 'okc', (config.auth_type in  [ 'sae', 'psk-sae', 'psk-sae-compat', 'owe' ]));
+		set_default(config, 'okc', (config.auth_type in  [ 'sae', 'psk-sae', 'psk-sae-compat', 'sae-ext', 'owe' ]));
 	}
 
 	if (!config.okc && !config.fils)
@@ -589,7 +590,7 @@ function iface_mtk_options(config) {
 	if (config.ieee80211w)
 		append_vars(config, [ 'beacon_prot' ]);
 
-	if (config.auth_type in [ 'sae', 'psk-sae' ])
+	if (config.auth_type in [ 'sae', 'psk-sae', 'sae-ext' ])
 		append_vars(config, [ 'sae_groups' ]);
 
 	if (config.auth_type in [ 'owe' ])

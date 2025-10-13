@@ -79,6 +79,11 @@ export function parse_encryption(config, dev_config, phy_features) {
 			config.rsn_override_pairwise_2 = 'GCMP-256';
 		break;
 
+	case 'sae-ext':
+		config.auth_type = 'sae-ext';
+		config.gcmp256 ??= wildcard(dev_config?.htmode ?? '', 'EHT*') || wildcard(dev_config?.htmode ?? '', 'UHR*');
+		break;
+
 	case 'wpa':
 	case 'wpa2':
 	case 'wpa-mixed':
@@ -226,6 +231,12 @@ export function wpa_key_mgmt(config, band) {
 					append_value(config, 'rsn_override_key_mgmt_2', 'FT-SAE-EXT-KEY');
 			}
 		}
+		break;
+
+	case 'sae-ext':
+		append_value(config, 'wpa_key_mgmt', 'SAE-EXT-KEY');
+		if (config.ieee80211r)
+			append_value(config, 'wpa_key_mgmt', 'FT-SAE-EXT-KEY');
 		break;
 
 	case 'owe':
