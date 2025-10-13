@@ -46,6 +46,8 @@ function iface_start(phydev, iface, macaddr_list)
 		wdev_config[field] = iface.config[field];
 	if (!wdev_config.macaddr)
 		wdev_config.macaddr = phydev.macaddr_next();
+	if (wdev_config.mld_allowed_phy_bitmap)
+		wdev_config.mld_radio_mask = wdev_config.mld_allowed_phy_bitmap;
 
 	wpas.data.iface_phy[ifname] = phy;
 	wdev_remove(ifname);
@@ -377,6 +379,9 @@ function iface_status_fill_radio_link(mld, radio, msg, link)
 
 	msg.frequency = link.frequency;
 	msg.sec_chan_offset = link.sec_chan_offset;
+	msg.oper_chwidth = link.oper_chwidth;
+	msg.bw320_offset = link.bw320_offset;
+	msg.punct_bitmap = link.punct_bitmap;
 }
 
 function iface_status_fill_radio(mld, radio, msg, status)
@@ -644,6 +649,8 @@ function iface_hostapd_notify(ifname, iface, state)
 	let msg = {};
 
 	let mld = wpas.data.mld[ifname];
+
+	wpas.printf(`ucode: mtk: wpa_s in state ${state} notifies hostapd`);
 	switch (state) {
 	case "DISCONNECTED":
 	case "AUTHENTICATING":
@@ -659,6 +666,9 @@ function iface_hostapd_notify(ifname, iface, state)
 		if (!mld) {
 			msg.frequency = status.frequency;
 			msg.sec_chan_offset = status.sec_chan_offset;
+			msg.oper_chwidth = status.oper_chwidth;
+			msg.bw320_offset = status.bw320_offset;
+			msg.punct_bitmap = status.punct_bitmap;
 		}
 		break;
 	default:
@@ -702,7 +712,10 @@ function iface_channel_switch(ifname, iface, info)
 		csa: true,
 		csa_count: info.csa_count ? info.csa_count - 1 : 0,
 		frequency: info.frequency,
+		oper_chwidth: info.oper_chwidth,
+		bw320_offset: info.bw320_offset,
 		sec_chan_offset: info.sec_chan_offset,
+		punct_bitmap: info.punct_bitmap,
 	};
 
 	let mld = wpas.data.mld[ifname];
@@ -859,7 +872,7 @@ return {
 		}
 	},
 	event: function(ifname, iface, ev, info) {
-		if (ev == "CH_SWITCH_STARTED")
+		if (ev == "CH_SWITCH_STARTED" || ev == "LINK_CH_SWITCH_STARTED")
 			iface_channel_switch(ifname, iface, info);
 	},
 	wps_credentials: function(ifname, iface, cred) {
