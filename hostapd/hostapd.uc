@@ -956,6 +956,9 @@ function iface_load_config(phy, radio, filename)
 			continue;
 		}
 
+		if (val[0] == "#mld_radio_mask" && int(val[1]))
+			bss.mld_radio_mask = int(val[1]);
+
 		if (val[0] == "nas_identifier")
 			bss.nasid = val[1];
 
