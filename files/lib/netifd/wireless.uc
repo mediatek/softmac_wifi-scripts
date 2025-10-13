@@ -158,6 +158,7 @@ function config_init(uci)
 			config,
 
 			vif: [],
+			mlo_vif_found: false,
 		};
 		handlers[name] = handler;
 	}
@@ -199,7 +200,16 @@ function config_init(uci)
 				vlan: [],
 				sta: [],
 			};
-			push(dev.vif, vif);
+
+			/* Due to hostapd's AP MLD implementation, it's better
+			 * that the first iface is MLO if MLO ifaces present.
+			 */
+			if (!dev.mlo_vif_found && mlo_vif && data.mode == 'ap') {
+				dev.mlo_vif_found = true;
+				unshift(dev.vif, vif);
+			} else {
+				push(dev.vif, vif);
+			}
 
 			vifs[name] ??= [];
 			push(vifs[name], vif);
