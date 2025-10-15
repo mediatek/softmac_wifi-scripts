@@ -162,6 +162,7 @@ function config_init(uci)
 					ifname = config.mode + "-mld" + idx;
 				}
 
+				mlo_config["4addr"] = !!mlo_config.wds;
 				mlo_vifs[ifname] = mlo_config;
 				mlo_created = true;
 			}
