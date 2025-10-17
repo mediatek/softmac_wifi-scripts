@@ -689,7 +689,8 @@
 		},
 		"tx_queue_data2_burst": {
 			"description": "",
-			"type": "number"
+			"type": "number",
+			"default": 0.0
 		},
 		"tx_stbc": {
 			"description": "Transmit STBC (Space-Time Block Coding)",
