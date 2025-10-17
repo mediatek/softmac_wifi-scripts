@@ -180,6 +180,10 @@ function mld_add(data, phy_list)
 		phy_list[phy_name] = phydev;
 	}
 
+
+	if (!data.config.macaddr)
+		data.config.macaddr = phydev.macaddr_next();
+
 	let wdev_config = { ...data.config, radio_mask: data.radio_mask };
 	if (!wdev_config.macaddr)
 		wdev_config.macaddr = phydev.macaddr_next();
