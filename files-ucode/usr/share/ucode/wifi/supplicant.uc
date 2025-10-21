@@ -67,6 +67,9 @@ function sta_global_mtk_options(config) {
 	if (config.auth_type in [ 'sae', 'psk-sae' ])
 		append_vars(config, [ 'sae_groups', 'sae_pwe' ]);
 
+	if (!config.mlo)
+		append_raw('disable_mld=1');
+
 	if (config.mlo && config.mld_assoc_band) {
 		switch (config.mld_assoc_band) {
 		case "2g":
