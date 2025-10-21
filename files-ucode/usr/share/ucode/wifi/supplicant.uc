@@ -61,11 +61,30 @@ export function ratelist(rates) {
 };
 
 function sta_global_mtk_options(config) {
-	append_vars(config, [ 'tx_queue_data2_burst', 'rsn_overriding', 'disable_rrm' ]);
+	append_vars(config, [ 'tx_queue_data2_burst', 'rsn_overriding', 'disable_rrm', 'mld_force_single_link' ]);
 	append_raw('wps_cred_add_sae=1');
 
 	if (config.auth_type in [ 'sae', 'psk-sae' ])
 		append_vars(config, [ 'sae_groups', 'sae_pwe' ]);
+
+	if (config.mlo && config.mld_assoc_band) {
+		switch (config.mld_assoc_band) {
+		case "2g":
+			config.mld_connect_band_pref = 1;
+			break;
+
+		case "5g":
+			config.mld_connect_band_pref = 2;
+			break;
+
+		case "6g":
+			config.mld_connect_band_pref = 3;
+			break;
+
+		}
+
+		append_vars(config, [ 'mld_connect_band_pref' ]);
+	}
 };
 
 function sta_network_mtk_options(config) {
@@ -346,6 +365,7 @@ export function generate(config_list, data, interface) {
 		config: file_name,
 		'4addr': !!interface.config.wds,
 		mlo: !!interface.config.mlo,
+		mld_assoc_band: interface.config.mld_assoc_band,
 		freq_list: data.config.scan_list,
 		powersave: false
 	};

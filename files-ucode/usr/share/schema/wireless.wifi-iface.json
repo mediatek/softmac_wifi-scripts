@@ -1367,6 +1367,16 @@
 			"description": "WMM for AP interface",
 			"type": "boolean",
 			"default": true
+		},
+		"mld_force_single_link": {
+			"description": "Force single link connection for STA interface",
+			"type": "number",
+			"enum": [ 0, 1 ]
+		},
+		"mld_assoc_band": {
+			"description": "For STA interface, specify the band to connect",
+			"type": "string",
+			"enum": [ "2g", "5g", "6g" ]
 		}
 	}
 }
