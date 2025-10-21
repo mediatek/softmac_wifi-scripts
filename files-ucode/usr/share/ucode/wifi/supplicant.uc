@@ -64,6 +64,9 @@ function sta_global_mtk_options(config) {
 
 	if (config.auth_type in [ 'owe' ])
 		append_vars(config, [ 'owe_groups' ]);
+
+	if (!config.mlo)
+		append_raw('disable_mld=1');
 };
 
 function sta_network_mtk_options(config) {
