@@ -1274,6 +1274,11 @@
 			"description": "Configuration for MTK vendor element in association response",
 			"type": "string",
 			"default": "dd07000ce700000000"
+		},
+		"mld_force_single_link": {
+			"description": "Force single link connection for STA interface",
+			"type": "number",
+			"enum": [ 0, 1 ]
 		}
 	}
 }
