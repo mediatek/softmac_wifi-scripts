@@ -207,6 +207,9 @@ function mld_add(data, phy_list)
 	if (length(data.freq_list) > 0)
 		iface.config('freq_list', data.freq_list);
 
+	if (data.mld_assoc_band)
+		iface.config('mld_assoc_band', data.mld_assoc_band);
+
 	data.radio_mask_up = data.radio_mask_present;
 }
 
@@ -268,10 +271,13 @@ function mld_set_iface_config(name, data, radio, config)
 	wpas.printf(`Set MLD interface ${name} radio ${radio} config: ${keys(config)}`);
 
 	data.phy_config[radio] = config;
-	if (config)
+	if (config) {
 		data.radio_mask_present |= 1 << radio;
-	else
+		data.mld_assoc_band = config.mld_assoc_band;
+	} else {
 		data.radio_mask_present &= ~(1 << radio);
+		data.mld_assoc_band = null;
+	}
 
 	let freq_list;
 	for (let config in data.phy_config) {
