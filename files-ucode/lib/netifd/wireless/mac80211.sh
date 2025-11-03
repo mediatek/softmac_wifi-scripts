@@ -103,15 +103,15 @@ function setup_phy(phy, config, data) {
 	log(`Configuring '${phy}' distance: ${config.distance}`);
 	if (antenna_changed) {
 		log(`Setting antenna for '${phy}' txantenna: ${config.txantenna}, rxantenna: ${config.rxantenna}`);
-		system(`iw phy ${phy} set antenna ${config.txantenna} ${config.rxantenna}`);
+		system(`iw phy ${phy} set antenna ${config.txantenna} ${config.rxantenna} radio ${config.radio}`);
 	}
 	system(`iw phy ${phy} set distance ${config.distance}`);
-	system(`iw phy ${phy} set txpower ${config.txpower}`);
+	system(`iw phy ${phy} set txpower ${config.txpower} radio ${config.radio}`);
 
 	if (config.frag)
 		system(`iw phy ${phy} set frag ${config.frag}`);
 	if (config.rts)
-		system(`iw phy ${phy} set rts ${config.rts}`);
+		system(`iw phy ${phy} set rts ${config.rts} radio ${config.radio}`);
 }
 
 function iw_htmode(config) {
