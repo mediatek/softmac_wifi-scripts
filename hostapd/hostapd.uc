@@ -1058,6 +1058,9 @@ function mld_add_bss(name, data, phy_list, i)
 	}
 
 	data.macaddr = config.macaddr;
+	if (config.mld_addr)
+		data.macaddr = config.mld_addr;
+
 	if (!data.macaddr) {
 		data.macaddr = phydev.macaddr_next();
 		data.default_macaddr = true;
