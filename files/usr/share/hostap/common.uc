@@ -185,6 +185,7 @@ const phy_proto = {
 	macaddr_init: function(used, options) {
 		this.macaddr_options = options ?? {};
 		this.macaddr_list = {};
+		this.mbssid_list = [];
 
 		if (type(used) == "object")
 			for (let addr in used)
@@ -280,9 +281,42 @@ const phy_proto = {
 		return macaddr_join(addr);
 	},
 
+	mbssid_macaddr_generate: function(data) {
+		/* check if we can keep MAC addresses for non-TX BSSes */
+		let base_addr = macaddr_split(this.mbssid_list[0]);
+		let num_bss = 1 << data.mbssid_indicator;
+		let b5 = base_addr[5] % num_bss;
+		let list = this.macaddr_list;
+		let mbssid_list = this.mbssid_list;
+
+		for (let i = 1; i < num_bss; i++) {
+			let addr = [...base_addr];
+			addr[5] = base_addr[5] - b5 + ((b5 + i) % num_bss);
+
+			let addr_str = macaddr_join(addr);
+			if (list[addr_str] != null)
+				return -1;
+
+			list[addr_str] = -1;
+			mbssid_list[i] = addr_str;
+		}
+
+		return 0;
+	},
+
+	set_mbssid_macaddr: function(tx_addr) {
+		let data = this.macaddr_options ?? {};
+
+		this.mbssid_list[0] = tx_addr;
+		return this.mbssid_macaddr_generate(data)
+	},
+
 	macaddr_next: function(val) {
 		let data = this.macaddr_options ?? {};
 		let list = this.macaddr_list;
+
+		if (data.mbssid && val > 0 && val < length(this.mbssid_list))
+			return this.mbssid_list[val];
 
 		for (let i = 0; i < 32; i++) {
 			data.id = i;
@@ -293,6 +327,12 @@ const phy_proto = {
 
 			if (list[mac] != null)
 				continue;
+
+			if (data.mbssid && val == 0) {
+				this.mbssid_list[0] = mac;
+				if (this.mbssid_macaddr_generate(data))
+					continue;
+			}
 
 			list[mac] = val != null ? val : -1;
 			return mac;

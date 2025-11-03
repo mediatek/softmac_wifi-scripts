@@ -311,7 +311,17 @@ function iface_macaddr_init(phydev, config, macaddr_list)
 		num_global: config.num_global_macaddr ?? 1,
 		macaddr_base: config.macaddr_base,
 		mbssid: config.mbssid ?? 0,
+		mbssid_indicator: 0,
 	};
+
+	if (config.mbssid) {
+		let num_bss = length(config.bss) - 1;
+
+		while (num_bss) {
+			num_bss /= 2;
+			macaddr_data.mbssid_indicator++;
+		}
+	}
 
 	return phydev.macaddr_init(macaddr_list, macaddr_data);
 }
@@ -334,10 +344,16 @@ function iface_restart(phydev, config, old_config)
 	}
 
 	iface_macaddr_init(phydev, config, iface_config_macaddr_list(config));
+
+	if (config.mbssid && length(config.bss) > 1 &&
+	    !config.bss[0].default_macaddr &&
+	    phydev.set_mbssid_macaddr(config.bss[0].bssid))
+		config.bss[0].default_macaddr = true;
+
 	for (let i = 0; i < length(config.bss); i++) {
 		let bss = config.bss[i];
-		if (bss.default_macaddr)
-			bss.bssid = phydev.macaddr_next();
+		if (bss.default_macaddr || (config.mbssid && i > 0))
+			bss.bssid = phydev.macaddr_next(i);
 	}
 
 	iface_pending_init(phydev, config);
