@@ -1284,6 +1284,14 @@
 			"description": "For STA interface, specify the band to connect",
 			"type": "string",
 			"enum": [ "2g", "5g", "6g" ]
+		},
+		"eml_disable": {
+			"description": "eml_disable",
+			"type": "boolean"
+		},
+		"eml_resp": {
+			"description": "eml_resp",
+			"type": "boolean"
 		}
 	}
 }

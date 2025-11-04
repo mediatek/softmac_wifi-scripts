@@ -477,7 +477,8 @@ function iface_mtk_options(config) {
 			      'fils_discovery_max_interval',
 			      'rssi_reject_assoc_timeout',
 			      'rnr', 'mld_addr', 'group_cipher',
-			      'assocresp_elements' ]);
+			      'assocresp_elements',
+			      'eml_disable', 'eml_resp' ]);
 
 	if (config.ieee80211w)
 		append_vars(config, [ 'beacon_prot' ]);

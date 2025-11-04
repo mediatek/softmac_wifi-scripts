@@ -755,14 +755,6 @@
 			"description": "PP bitmap",
 			"type": "number"
 		},
-		"eml_disable": {
-			"description": "eml_disable",
-			"type": "boolean"
-		},
-		"eml_resp": {
-			"description": "eml_resp",
-			"type": "boolean"
-		},
 		"mu_onoff": {
 			"description": "mu_onoff",
 			"type": "boolean"
