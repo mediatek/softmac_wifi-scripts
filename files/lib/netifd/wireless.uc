@@ -131,10 +131,24 @@ function config_init(uci)
 	for (let name, data in sections.iface) {
 		let dev_names = parse_array(data.device);
 		let mlo_vif = parse_bool(data.mlo);
+		let ifname;
+
+		if (mlo_vif) {
+			/* Delete the non-EHT or disabled device */
+			let tmp_dev_names = [];
+			for (let dev_name in dev_names) {
+				let dev = devices[dev_name];
+				if (dev && !dev.config.disabled &&
+				    wildcard(dev.config.htmode, 'EHT*'))
+					push(tmp_dev_names, dev_name);
+			}
+
+			dev_names = [...tmp_dev_names];
+		}
+
 		let radios = map(dev_names, (v) => radio_idx[v]);
 		radios = filter(radios, (v) => v != null);
 		let radio_config = map(dev_names, (v) => devices[v].config);
-		let ifname;
 		let mlo_created = false;
 
 		for (let dev_name in dev_names) {
