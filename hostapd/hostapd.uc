@@ -994,9 +994,12 @@ function iface_load_config(phy, radio, filename)
 		config.bss[0] = config.bss[first_mld_bss];
 		config.bss[first_mld_bss] = tmp_bss;
 
-		let tmp_bssid = config.bss[0].bssid;
-		config.bss[0].bssid = config.bss[first_mld_bss].bssid;
-		config.bss[first_mld_bss].bssid = tmp_bssid;
+		if (config.mbssid) {
+			let tmp_bssid = config.bss[0].bssid;
+			config.bss[0].bssid = config.bss[first_mld_bss].bssid;
+			config.bss[first_mld_bss].bssid = tmp_bssid;
+		}
+
 		hostapd.printf(`mtk: ucode: switch bss[${first_mld_bss}] to first`);
 	}
 
