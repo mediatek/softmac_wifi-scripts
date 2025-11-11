@@ -1292,6 +1292,11 @@
 		"eml_resp": {
 			"description": "eml_resp",
 			"type": "boolean"
+		},
+		"wmm": {
+			"description": "WMM for AP interface",
+			"type": "boolean",
+			"default": true
 		}
 	}
 }
