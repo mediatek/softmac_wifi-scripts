@@ -1297,6 +1297,11 @@
 			"description": "WMM for AP interface",
 			"type": "boolean",
 			"default": true
+		},
+		"assign_link_id": {
+			"description": "Assign link ID based on radio index for AP interface",
+			"type": "boolean",
+			"default": false
 		}
 	}
 }

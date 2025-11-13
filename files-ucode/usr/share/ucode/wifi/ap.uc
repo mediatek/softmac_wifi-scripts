@@ -578,7 +578,7 @@ export function generate(interface, data, config, vlans, stas, phy_features) {
 
 	if (config.mlo) {
 		append_raw('mld_ap=1');
-		if (data.config.radio != null)
+		if (config.assign_link_id && data.config.radio != null)
 			append_raw('mld_link_id=' + data.config.radio);
 	}
 
