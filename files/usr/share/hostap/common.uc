@@ -231,7 +231,7 @@ const phy_proto = {
 				if (radio_idx && radio_idx < length(addrs))
 					base_addr = addrs[radio_idx];
 				else
-					idx += radio_idx * 16;
+					idx += radio_idx * 32;
 			} else {
 				if (idx < length(addrs))
 					return addrs[idx];
