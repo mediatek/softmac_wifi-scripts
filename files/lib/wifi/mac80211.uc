@@ -211,7 +211,7 @@ set ${mld_sec}.network='lan'
 set ${mld_sec}.mode='ap'
 set ${mld_sec}.mlo=1
 set ${mld_sec}.ssid='MT76_AP_MLD'
-set ${mld_sec}.encryption='sae-ext'
+set ${mld_sec}.encryption='sae-mixed'
 set ${mld_sec}.key=12345678
 set ${mld_sec}.sae_pwe=2
 `);

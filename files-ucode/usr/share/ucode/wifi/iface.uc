@@ -192,7 +192,7 @@ export function wpa_key_mgmt(config) {
 		if (config.mode == 'ap' && config.rsn_override) {
 			append_value(config, 'rsn_override_key_mgmt_2', 'SAE-EXT-KEY');
 			if (config.ieee80211r)
-				append_value(config, 'rsn_override_key_mgmt_2', 'FT-SAE');
+				append_value(config, 'rsn_override_key_mgmt_2', 'FT-SAE-EXT-KEY');
 		}
 		break;
 
@@ -211,10 +211,10 @@ export function wpa_key_mgmt(config) {
 
 		if (config.rsn_override) {
 			append_value(config, 'rsn_override_key_mgmt', 'SAE');
-			append_value(config, 'rsn_override_key_mgmt_2', 'SAE');
+			append_value(config, 'rsn_override_key_mgmt_2', 'SAE-EXT-KEY');
 			if (config.ieee80211r) {
 				append_value(config, 'rsn_override_key_mgmt', 'FT-SAE');
-				append_value(config, 'rsn_override_key_mgmt_2', 'FT-SAE');
+				append_value(config, 'rsn_override_key_mgmt_2', 'FT-SAE-EXT-KEY');
 			}
 		}
 
