@@ -134,12 +134,13 @@ function config_init(uci)
 		let ifname;
 
 		if (mlo_vif) {
-			/* Delete the non-EHT or disabled device */
+			/* Disallow disabled device or AP using non-EHT device */
 			let tmp_dev_names = [];
 			for (let dev_name in dev_names) {
 				let dev = devices[dev_name];
 				if (dev && !dev.config.disabled &&
-				    wildcard(dev.config.htmode, 'EHT*'))
+				    (wildcard(dev.config.htmode, 'EHT*') ||
+				     data.mode == 'sta'))
 					push(tmp_dev_names, dev_name);
 			}
 
