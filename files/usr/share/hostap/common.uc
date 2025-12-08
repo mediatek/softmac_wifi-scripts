@@ -208,7 +208,6 @@ const phy_proto = {
 		let idx = int(data.id ?? 0);
 		let mbssid = int(data.mbssid ?? 0) > 0;
 		let num_global = int(data.num_global ?? 1);
-		let use_global = !mbssid && idx < num_global;
 
 		let base_addr = phy_sysfs_file(phy, "macaddress");
 		if (!base_addr)
@@ -241,13 +240,12 @@ const phy_proto = {
 		if (!idx && !mbssid)
 			return base_addr;
 
+		let use_global = !mbssid && idx < num_global;
 		let addr = macaddr_split(base_addr);
 		let mask = macaddr_split(base_mask);
 		let type;
 
-		if (mbssid)
-			type = "b5";
-		else if (use_global)
+		if (use_global)
 			type = "add";
 		else if (mask[0] > 0)
 			type = "b1";
@@ -257,22 +255,21 @@ const phy_proto = {
 			type = "add";
 
 		switch (type) {
-		case "b1":
-			if (!(addr[0] & 2))
-				idx--;
-			addr[0] |= 2;
-			addr[0] ^= idx << 2;
-			break;
 		case "b5":
 			if (mbssid)
 				addr[0] |= 2;
 			addr[5] ^= idx;
 			break;
+		case "b1":
+			addr[0] |= 2;
+			addr[0] ^= (radio_idx ?? 0) << 2;
+			// fallthrough
 		default:
-			for (let i = 5; i > 0; i--) {
+			for (let i = 4; i > 0; i--) {
 				addr[i] += idx;
 				if (addr[i] < 256)
 					break;
+				idx = addr[i] / 256;
 				addr[i] %= 256;
 			}
 			break;
