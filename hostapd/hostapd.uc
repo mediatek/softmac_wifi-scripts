@@ -1214,12 +1214,14 @@ let main_obj = {
 
 			hostapd.printf(`ucode: mtk: apsta state update`);
 			hostapd.printf(`    * phy: ${req.args.phy}`);
+			hostapd.printf(`    * radio: ${req.args.radio}`);
 			hostapd.printf(`    * up: ${req.args.up}`);
 			hostapd.printf(`    * freqeuncy: ${req.args.frequency}`);
 			hostapd.printf(`    * sec_chan_offset: ${req.args.sec_chan_offset}`);
 			hostapd.printf(`    * oepr_chwidth: ${req.args.oper_chwidth}`);
 			hostapd.printf(`    * bw320_offset: ${req.args.bw320_offset}`);
 			hostapd.printf(`    * csa: ${req.args.csa}`);
+			hostapd.printf(`    * csa_count: ${req.args.csa_count}`);
 			hostapd.printf(`    * punct_bitmap: ${req.args.punct_bitmap}`);
 
 			let config = hostapd.data.config[phy];
