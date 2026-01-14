@@ -137,13 +137,6 @@ function device_cell_density_append(config) {
 	}
 }
 
-function device_rates(config) {
-	for (let key in [ 'supported_rates', 'basic_rates' ])
-		config[key] = map(config[key], x => x / 100);
-
-	append_vars(config, [ 'beacon_rate', 'supported_rates', 'basic_rates' ]);
-}
-
 function he_bss_color_random() {
 	let f = fs.open("/dev/urandom", "r");
 
@@ -566,10 +559,8 @@ function generate(config) {
 
 	device_cell_density_append(config);
 
-	device_rates(config);
-
 	/* beacon */
-	append_vars(config, [ 'beacon_int', 'beacon_rate', 'rnr_beacon' ]);
+	append_vars(config, [ 'beacon_int', 'rnr_beacon' ]);
 
 	/* wpa_supplicant co-exist */
 	append_vars(config, [ 'noscan' ]);

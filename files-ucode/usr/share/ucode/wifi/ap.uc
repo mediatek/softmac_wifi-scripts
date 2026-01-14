@@ -471,6 +471,17 @@ function iface_interworking(config) {
 	]);
 }
 
+function iface_rates(config, dev_config) {
+	config.beacon_rate ??= dev_config.beacon_rate;
+	config.supported_rates ??= dev_config.beacon_rates;
+	config.basic_rates ??= dev_config.basic_rates;
+
+	for (let key in [ 'supported_rates', 'basic_rates' ])
+		config[key] = map(config[key], x => x / 100);
+
+	append_vars(config, [ 'beacon_rate', 'supported_rates', 'basic_rates' ]);
+}
+
 function iface_mtk_options(config) {
 	append_vars(config, [ 'unsol_bcast_probe_resp_interval' ,
 			      'fils_discovery_min_interval',
@@ -539,6 +550,8 @@ export function generate(interface, data, config, vlans, stas, phy_features) {
 	iface_hs20(config);
 
 	iface_interworking(config);
+
+	iface_rates(config, data.config);
 
 	iface.wpa_key_mgmt(config);
 	append_vars(config, [
