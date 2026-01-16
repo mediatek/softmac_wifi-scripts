@@ -53,10 +53,6 @@ for (let phy_name, phy in board.wlan) {
 			break;
 	}
 
-	/* TODO Remove this for multiple wiphy device */
-	if (phy_name != "phy0")
-		continue;
-
 	let radios = [];
 	let device_list = [];
 	if (length(info.radios) > 0) {
