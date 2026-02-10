@@ -594,6 +594,9 @@ function iface_mtk_options(config) {
 
 	if (config.auth_type in [ 'owe' ])
 		append_vars(config, [ 'owe_groups' ]);
+
+	if (config.mlo)
+		append_vars(config, [ 'expected_mlo_link_num' ]);
 }
 
 export function generate(interface, data, config, vlans, stas, phy_features) {

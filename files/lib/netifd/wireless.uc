@@ -198,6 +198,7 @@ function config_init(uci)
 
 			let config = parse_attribute_list(data, handler.iface);
 			config.radios = radios;
+			config.expected_mlo_link_num = length(dev_names);
 
 			if (mlo_vif && !mlo_created) {
 				ifname = mlo_vif_create(config, radio_config, vif_idx, mlo_vifs);
