@@ -489,7 +489,7 @@ function iface_mtk_options(config) {
 			      'rssi_reject_assoc_timeout',
 			      'rnr', 'mld_addr', 'group_cipher',
 			      'assocresp_elements',
-			      'eml_disable', 'eml_resp',
+			      'eml_disable',
 			      'emlsr_on_one_link' ]);
 
 	if (config.ieee80211w)
