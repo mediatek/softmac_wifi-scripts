@@ -1615,6 +1615,21 @@ let main_obj = {
 			};
 		}
 	},
+	mld_get: {
+		args: {
+		},
+		call: function(req) {
+			let phy = req.args.phy;
+			let ret = {};
+			for (let name, mld in hostapd.data.mld) {
+				ret[name] = {};
+				if (mld.macaddr)
+					ret[name].macaddr = mld.macaddr;
+			}
+
+			return ret;
+		}
+	},
 	config_reset: {
 		args: {
 		},

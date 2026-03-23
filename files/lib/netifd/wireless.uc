@@ -90,6 +90,13 @@ function update_config(new_devices, mlo_vifs)
 	hostapd_update_mlo();
 	supplicant_update_mlo();
 
+	let mld_data = ubus.call({
+		object: "hostapd",
+		method: "mld_get",
+		data: {
+		},
+	});
+
 	for (let name, dev in wireless.devices)
 		if (!new_devices[name])
 			dev.destroy();
@@ -107,6 +114,15 @@ function update_config(new_devices, mlo_vifs)
 			continue;
 
 		wireless.devices[name] = cur_dev;
+	}
+
+	/* Write AP's MLD address to config */
+	for (let name, dev in wireless.devices) {
+		for (let vif_data in dev.data.vif) {
+			if (mld_data[vif_data.config.ifname]?.macaddr)
+				vif_data.config.mld_addr =
+					mld_data[vif_data.config.ifname].macaddr;
+		}
 	}
 }
 
