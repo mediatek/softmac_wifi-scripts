@@ -163,7 +163,19 @@
 			"type": "string"
 		},
 		"basic_rate": {
-			"type": "array"
+			"type": "alias",
+			"default": "basic_rates"
+		},
+		"basic_rates": {
+			"description": "Set the supported basic rates. Each basic_rate is measured in kb/s. This option only has an effect on ap and adhoc wifi-ifaces. ",
+			"type": "array",
+			"items": {
+				"type": "number"
+			}
+		},
+		"beacon_rate": {
+			"description": "Beacon frame TX rate configuration",
+			"type": "string"
 		},
 		"beacon_prot": {
 			"description": "Management frame protection for Beacon frames",
@@ -1054,7 +1066,11 @@
 			"type": "string"
 		},
 		"supported_rates": {
-			"type": "array"
+			"description": "Set the supported data rates. Each supported rate is measured in kb/s. This option only has an effect on ap and adhoc wifi-ifaces. This must be a superset of the rates set in basic_rate. The minimum basic rate should also be the minimum supported rate. It is recommended to use the cell_density option instead",
+			"type": "array",
+			"items": {
+				"type": "number"
+			}
 		},
 		"tdls_prohibit": {
 			"description": "Prohibit use of TDLS in this BSS",
@@ -1234,6 +1250,123 @@
 		"wps_pushbutton": {
 			"description": "Support WPS pushbutton",
 			"type": "boolean"
+		},
+		"interworking": {
+			"description": "interworking",
+			"type": "boolean",
+			"default": false
+		},
+		"unsol_bcast_probe_resp_interval": {
+			"description": "unsol_bcast_probe_resp_interval",
+			"type": "number"
+		},
+		"fils_discovery_min_interval": {
+			"description": "fils_discovery_min_interval",
+			"type": "number"
+		},
+		"fils_discovery_max_interval": {
+			"description": "fils_discovery_max_interval",
+			"type": "number"
+		},
+		"rssi_reject_assoc_timeout": {
+			"description": "Association retry delay in seconds allowed by the STA if RSSI has not met the threshold",
+			"type": "number",
+			"minimum": 0,
+			"maximum": 255
+		},
+		"mld_addr": {
+			"description": "AP MLD address",
+			"type": "string"
+		},
+		"beacon_prot": {
+			"description": "Beacon protection",
+			"type": "boolean"
+		},
+		"sae_groups": {
+			"description": "sae_groups",
+			"type": "array",
+			"items": {
+				"type": "number"
+			}
+		},
+		"owe_groups": {
+			"description": "owe_groups for hostapd setup",
+			"type": "array",
+			"items": {
+				"type": "number"
+			}
+		},
+		"owe_group": {
+			"description": "owe_groups for wpa_supplicant setup",
+			"type": "number"
+		},
+		"pairwise": {
+			"description": "pairwise cipher",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"group_cipher": {
+			"description": "Group cipher",
+			"type": "string"
+		},
+		"group_mgmt_cipher": {
+			"type": "alias",
+			"default": "ieee80211w_mgmt_cipher"
+		},
+		"tx_queue_data2_burst": {
+			"description": "set tx_queue_data2_burst for STA",
+			"type": "string",
+			"default": "0"
+		},
+		"disable_ht": {
+			"description": "Disable HT mode for STA",
+			"type": "boolean"
+		},
+		"disable_vht": {
+			"description": "Disable VHT mode for STA",
+			"type": "boolean"
+		},
+		"disable_he": {
+			"description": "Disable HE mode for STA",
+			"type": "boolean"
+		},
+		"disable_eht": {
+			"description": "Disable EHT mode for STA",
+			"type": "boolean"
+		},
+		"rsn_overriding": {
+			"description": "RSN overriding for STA",
+			"type": "number",
+			"enum": [ 0, 1, 2 ],
+			"default": 2
+		},
+		"disable_rrm": {
+			"description": "Disable Radio Resource Management (RRM)",
+			"type": "boolean"
+		},
+		"mtk_vendor_element": {
+			"description": "Configuration for MTK vendor element in association request",
+			"type": "string"
+		},
+		"assocresp_elements": {
+			"description": "Configuration for MTK vendor element in association response",
+			"type": "string",
+			"default": "dd07000ce700000000"
+		},
+		"eml_disable": {
+			"description": "eml_disable",
+			"type": "boolean"
+		},
+		"emlsr_on_one_link": {
+			"description": "Support EMLSR enablement on one link",
+			"type": "boolean"
+		},
+		"wmm": {
+			"description": "WMM for AP interface",
+			"type": "boolean",
+			"default": true
 		}
 	}
 }

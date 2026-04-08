@@ -60,6 +60,25 @@ export function ratelist(rates) {
 	return join(",", map(rates, (rate) => ratestr(rate)));
 };
 
+function sta_global_mtk_options(config) {
+	append_vars(config, [ 'tx_queue_data2_burst', 'rsn_overriding', 'disable_rrm' ]);
+
+	if (config.auth_type in [ 'sae', 'psk-sae' ])
+		append_vars(config, [ 'sae_groups', 'sae_pwe' ]);
+};
+
+function sta_network_mtk_options(config) {
+	network_append_vars(config, [ 'disable_he', 'disable_eht', 'mtk_vendor_element' ]);
+
+	if (config.ieee80211w) {
+		network_append_vars(config, [ 'beacon_prot' ]);
+		network_append('group_mgmt', config.ieee80211w_mgmt_cipher);
+	}
+
+	if (config.auth_type in [ 'owe' ])
+		network_append_vars(config, [ 'owe_group' ]);
+};
+
 function setup_sta(data, config) {
 	iface.parse_encryption(config, data);
 
@@ -239,6 +258,12 @@ function setup_sta(data, config) {
 		'private_key', 'private_key_passwd', 'private_key2', 'private_key2_passwd',
 		'dpp_connector',
 		 ]);
+
+	if (config.group_cipher)
+		config.group = config.group_cipher;
+	else
+		config.group = "CCMP TKIP CCMP-256 GCMP GCMP-256";
+
 	network_append_vars(config, [
 		'rsn_overriding', 'scan_ssid', 'noscan', 'disabled', 'multi_ap_profile', 'multi_ap_backhaul_sta',
 		'ocv', 'beacon_prot', 'key_mgmt', 'sae_pwe', 'psk', 'sae_password', 'pairwise', 'group', 'bssid',
@@ -248,6 +273,8 @@ function setup_sta(data, config) {
 		'bssid_blacklist', 'bssid_whitelist', 'erp', 'eap', 'phase2',
 		'dpp_csign', 'dpp_netaccesskey',
 	]);
+
+	sta_network_mtk_options(config);
 }
 
 
@@ -304,6 +331,7 @@ export function generate(config_list, data, interface) {
 	append_vars(interface.config, [ 'country', 'beacon_int', 'freq_list' ]);
 
 	setup_sta(data.config, interface.config);
+	sta_global_mtk_options(interface.config);
 
 	let file_name = `/var/run/wpa-supplicant-${interface.config.ifname}.conf`;
 	if (fs.stat(file_name))

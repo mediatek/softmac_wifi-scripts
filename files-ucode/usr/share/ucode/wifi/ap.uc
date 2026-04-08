@@ -34,10 +34,13 @@ function iface_setup(config, phy, num_global_macaddr, macaddr_base) {
 
 	config.bridge = config.network_bridge;
 	config.snoop_iface = config.network_ifname;
-	if (!config.wds)
+	if (!config.wds) {
 		config.wds_bridge = null;
-	else
+	} else {
+		if (!config.wds_bridge)
+			config.wds_bridge = config.bridge;
 		config.wds_sta = true;
+	}
 
 	if (!config.idx)
 		append('interface', config.ifname);
@@ -52,7 +55,7 @@ function iface_setup(config, phy, num_global_macaddr, macaddr_base) {
 
 	append('bssid', config.macaddr);
 	config.ssid2 = config.ssid;
-	config.wmm_enabled = 1;
+	config.wmm_enabled = config.wmm;
 	append_string_vars(config, [ 'ssid2' ]);
 
 	/* vendor_elements is a single concatenated hex blob, not one per line */
@@ -536,7 +539,7 @@ function iface_hs20(config) {
 }
 
 function iface_interworking(config) {
-	if (!config.iw_enabled)
+	if (!config.iw_enabled && !config.interworking)
 		return;
 
 	config.interworking = true;
@@ -555,9 +558,35 @@ function iface_interworking(config) {
 	append_list(config, [ 'anqp_elem', 'nai_realm', 'venue_name', 'venue_url' ]);
 }
 
-function iface_rates(config) {
+function iface_rates(config, dev_config) {
+	config.beacon_rate ??= dev_config.beacon_rate;
+	config.supported_rates ??= dev_config.beacon_rates;
+	config.basic_rates ??= dev_config.basic_rates;
+
 	for (let key in [ 'supported_rates', 'basic_rates' ])
-		append(key, map(config[key], x => x / 100))
+		config[key] = map(config[key], x => x / 100);
+
+	append_vars(config, [ 'beacon_rate', 'supported_rates', 'basic_rates' ]);
+}
+
+function iface_mtk_options(config) {
+	append_vars(config, [ 'unsol_bcast_probe_resp_interval' ,
+			      'fils_discovery_min_interval',
+			      'fils_discovery_max_interval',
+			      'rssi_reject_assoc_timeout',
+			      'rnr', 'mld_addr', 'group_cipher',
+			      'assocresp_elements',
+			      'eml_disable',
+			      'emlsr_on_one_link' ]);
+
+	if (config.ieee80211w)
+		append_vars(config, [ 'beacon_prot' ]);
+
+	if (config.auth_type in [ 'sae', 'psk-sae' ])
+		append_vars(config, [ 'sae_groups' ]);
+
+	if (config.auth_type in [ 'owe' ])
+		append_vars(config, [ 'owe_groups' ]);
 }
 
 export function generate(interface, data, config, vlans, stas, phy_features) {
@@ -579,7 +608,7 @@ export function generate(interface, data, config, vlans, stas, phy_features) {
 	if (config.auth_type in [ 'sae', 'psk-sae', 'psk-sae-compat' ])
 		iface_sae_stations(config, stas);
 
-	iface_rates(data.config);
+	iface_rates(config, data.config);
 
 	iface_auth_type(config, data.config.band);
 
@@ -639,6 +668,8 @@ export function generate(interface, data, config, vlans, stas, phy_features) {
 	/* raw options */
 	for (let raw in config.hostapd_bss_options)
 		append_raw(raw);
+
+	iface_mtk_options(config);
 
 	if (config.mlo) {
 		append_raw('mld_ap=1');

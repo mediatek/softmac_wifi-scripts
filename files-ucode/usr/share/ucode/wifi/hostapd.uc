@@ -545,7 +545,7 @@ function generate(config) {
 	device_cell_density_append(config);
 
 	/* beacon */
-	append_vars(config, [ 'beacon_int', 'beacon_rate', 'rnr_beacon' ]);
+	append_vars(config, [ 'beacon_int', 'rnr_beacon' ]);
 
 	/* wpa_supplicant co-exist */
 	append_vars(config, [ 'noscan' ]);
