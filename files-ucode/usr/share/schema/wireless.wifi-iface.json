@@ -1336,6 +1336,10 @@
 			"description": "Disable EHT mode for STA",
 			"type": "boolean"
 		},
+		"disable_uhr": {
+			"description": "Disable UHR mode for STA",
+			"type": "boolean"
+		},
 		"rsn_overriding": {
 			"description": "RSN overriding for STA",
 			"type": "number",

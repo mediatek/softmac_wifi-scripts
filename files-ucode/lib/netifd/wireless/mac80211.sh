@@ -119,13 +119,17 @@ function iw_htmode(config) {
 	case "VHT20":
 	case "HE20":
 	case "EHT20":
+	case "UHR20":
 		return "HT20";
 	case "VHT80":
 	case "HE80":
 	case "EHT80":
+	case "UHR80":
 	case "HE160":
 	case "EHT160":
+	case "UHR160":
 	case "EHT320":
+	case "UHR320":
 		return "80MHZ";
 	case "NONE":
 	case "NOHT":

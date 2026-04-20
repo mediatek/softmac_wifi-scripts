@@ -3,7 +3,7 @@ import { readfile } from "fs";
 import * as uci from 'uci';
 
 const bands_order = [ "6G", "5G", "2G" ];
-const htmode_order = [ "EHT", "HE", "VHT", "HT" ];
+const htmode_order = [ "UHR", "EHT", "HE", "VHT", "HT" ];
 
 let board = json(readfile("/etc/board.json"));
 if (!board.wlan)
@@ -43,7 +43,7 @@ for (let phy_name, phy in board.wlan) {
 
 	for (let band_name, band in info.bands) {
 		for (let mode in band.modes) {
-			if (wildcard(mode, 'EHT*')) {
+			if (wildcard(mode, 'UHR*') || wildcard(mode, 'EHT*')) {
 				has_mlo = true;
 				break;
 			}

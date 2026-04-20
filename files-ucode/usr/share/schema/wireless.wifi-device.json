@@ -376,7 +376,8 @@
 				"NOHT", "HT20", "HT40-", "HT40+", "HT40",
 				"VHT20", "VHT40", "VHT40-", "VHT40+", "VHT80", "VHT160",
 				"HE20", "HE40", "HE40-", "HE40+", "HE80", "HE160",
-				"EHT20", "EHT40", "EHT40-", "EHT40+", "EHT80", "EHT160", "EHT320", "EHT320-1", "EHT320-2" ]
+				"EHT20", "EHT40", "EHT40-", "EHT40+", "EHT80", "EHT160", "EHT320", "EHT320-1", "EHT320-2",
+				"UHR20", "UHR40", "UHR40-", "UHR40+", "UHR80", "UHR160", "UHR320", "UHR320-1", "UHR320-2" ]
 		},
 		"hwmode": {
 			"type": "alias",

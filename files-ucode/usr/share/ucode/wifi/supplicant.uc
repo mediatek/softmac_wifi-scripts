@@ -16,22 +16,22 @@ function set_fixed_freq(data, config) {
 	set_default(config, 'fixed_freq', 1);
 	set_default(config, 'frequency', data.frequency);
 
-	if (data.htmode in [ 'VHT80', 'HE80', 'EHT80' ])
+	if (data.htmode in [ 'VHT80', 'HE80', 'EHT80', 'UHR80' ])
 		set_default(config, 'max_oper_chwidth', 1);
-	else if (data.htmode in [ 'VHT160', 'HE160', 'EHT160' ])
+	else if (data.htmode in [ 'VHT160', 'HE160', 'EHT160', 'UHR160' ])
 		set_default(config, 'max_oper_chwidth', 2);
-	else if (data.htmode in [ 'EHT320' ])
+	else if (data.htmode in [ 'EHT320', 'UHR320' ])
 		set_default(config, 'max_oper_chwidth', 9);
-	else if (data.htmode in [ 'VHT20', 'VHT40', 'HE20', 'HE40', 'EHT20', 'EHT40' ])
+	else if (data.htmode in [ 'VHT20', 'VHT40', 'HE20', 'HE40', 'EHT20', 'EHT40', 'UHR20', 'UHR40' ])
 		set_default(config, 'max_oper_chwidth', 0);
 	else
 		set_default(config, 'disable_vht', true);
 
 	if (data.htmode in [ 'NOHT' ])
 		set_default(config, 'disable_ht', true);
-	else if (data.htmode in [ 'HT20', 'VHT20', 'HE20', 'EHT20' ])
+	else if (data.htmode in [ 'HT20', 'VHT20', 'HE20', 'EHT20', 'UHR20' ])
 		set_default(config, 'disable_ht40', true);
-	else if (data.htmode in [ 'VHT40', 'VHT80', 'VHT160', 'HE40', 'HE80', 'HE160', 'EHT40', 'EHT80', 'EHT160', 'EHT320' ])
+	else if (data.htmode in [ 'VHT40', 'VHT80', 'VHT160', 'HE40', 'HE80', 'HE160', 'EHT40', 'EHT80', 'EHT160', 'EHT320', 'UHR40', 'UHR80', 'UHR160', 'UHR320' ])
 		set_default(config, 'ht40', true);
 
 	if (wildcard(data.htmode, 'VHT*'))
@@ -91,7 +91,7 @@ function sta_global_mtk_options(config) {
 };
 
 function sta_network_mtk_options(config) {
-	network_append_vars(config, [ 'disable_he', 'disable_eht', 'mtk_vendor_element' ]);
+	network_append_vars(config, [ 'disable_he', 'disable_eht', 'disable_uhr', 'mtk_vendor_element' ]);
 
 	if (config.ieee80211w) {
 		network_append_vars(config, [ 'beacon_prot' ]);
@@ -109,7 +109,7 @@ function setup_sta(data, config) {
 		config.ieee80211w = 2;
 	else if (config.auth_type in [ 'psk-sae' ] && !config.ieee80211w)
 		config.ieee80211w = 1;
-	if ((wildcard(data.htmode, 'EHT*') || wildcard(data.htmode, 'HE*')) &&
+	if ((wildcard(data.htmode, 'UHR*') || wildcard(data.htmode, 'EHT*') || wildcard(data.htmode, 'HE*')) &&
 		config.rsn_override)
 		config.rsn_overriding = 1;
 	else

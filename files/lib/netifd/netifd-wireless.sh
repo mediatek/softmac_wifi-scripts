@@ -81,7 +81,7 @@ _wdev_prepare_channel() {
 	esac
 
 	case "$htmode" in
-		HE*|EHT*) wpa3_cipher="GCMP-256 ";;
+		HE*|EHT*|UHR*) wpa3_cipher="GCMP-256 ";;
 		*) wpa3_cipher="";;
 	esac
 }

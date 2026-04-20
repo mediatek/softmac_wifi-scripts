@@ -1422,7 +1422,7 @@ wpa_supplicant_add_network() {
 
 	rsn_overriding=0
 	case "$htmode" in
-	EHT*|HE*) [ "$rsn_override" -gt 0 ] && rsn_overriding=1;;
+	UHR*|EHT*|HE*) [ "$rsn_override" -gt 0 ] && rsn_overriding=1;;
 	esac
 	append network_data "rsn_overriding=$rsn_overriding" "$N$T"
 

@@ -157,11 +157,11 @@ function device_htmode_append(config) {
 	/* 802.11n */
 	config.ieee80211n = 0;
 	if (config.band != '6g') {
-		if (config.htmode in [ 'VHT20', 'HT20', 'HE20', 'EHT20' ]) {
+		if (config.htmode in [ 'VHT20', 'HT20', 'HE20', 'EHT20', 'UHR20' ]) {
 			config.ieee80211n = 1;
 			config.ht_capab = '';
 		}
-		if (config.htmode in [ 'HT40', 'HT40+', 'HT40-', 'VHT40', 'VHT40+', 'VHT40-', 'VHT80', 'VHT160', 'HE40', 'HE40+', 'HE40-', 'HE80', 'HE160', 'EHT40', 'EHT40+', 'EHT40-', 'EHT80', 'EHT160' ]) {
+		if (config.htmode in [ 'HT40', 'HT40+', 'HT40-', 'VHT40', 'VHT40+', 'VHT40-', 'VHT80', 'VHT160', 'HE40', 'HE40+', 'HE40-', 'HE80', 'HE160', 'EHT40', 'EHT40+', 'EHT40-', 'EHT80', 'EHT160', 'UHR40', 'UHR40+', 'UHR40-', 'UHR80', 'UHR160' ]) {
 			config.ieee80211n = 1;
 			if (!config.channel)
 				switch (config.htmode) {
@@ -195,6 +195,7 @@ function device_htmode_append(config) {
 					case 'VHT40+':
 					case 'HE40+':
 					case 'EHT40+':
+					case 'UHR40+':
 						config.ht_capab = '[HT40+]';
 						break;
 
@@ -202,6 +203,7 @@ function device_htmode_append(config) {
 					case 'VHT40-':
 					case 'HE40-':
 					case 'EHT40-':
+					case 'UHR40-':
 						config.ht_capab = '[HT40-]';
 						break;
 
@@ -248,17 +250,20 @@ function device_htmode_append(config) {
 	case 'VHT20':
 	case 'HE20':
 	case 'EHT20':
+	case 'UHR20':
 		break;
 
 	case 'VHT40':
 	case 'HE40':
 	case 'EHT40':
+	case 'UHR40':
 		config.vht_oper_centr_freq_seg0_idx = config.channel + (((config.channel / 4) + config.channel_offset) % 2 ? 2 : -2);
 		break;
 
 	case 'VHT80':
 	case 'HE80':
 	case 'EHT80':
+	case 'UHR80':
 		let delta = [ -6, 6, 2, -2 ];
 		config.vht_oper_centr_freq_seg0_idx = config.channel + delta[((config.channel / 4) + config.channel_offset) % 4];
 		config.vht_oper_chwidth = 1;
@@ -270,6 +275,10 @@ function device_htmode_append(config) {
 	case 'EHT320':
 	case 'EHT320-1':
 	case 'EHT320-2':
+	case 'UHR160':
+	case 'UHR320':
+	case 'UHR320-1':
+	case 'UHR320-2':
 		let vht_oper_centr_freq_seg0_idx_map = [[ 64, 50 ], [ 128, 114 ], [ 177, 163 ]];
 		if (config.band == '6g')
 			vht_oper_centr_freq_seg0_idx_map = [
@@ -297,17 +306,22 @@ function device_htmode_append(config) {
 		switch(config.htmode) {
 		case 'HE20':
 		case 'EHT20':
+		case 'UHR20':
 			config.op_class = 131;
 			break;
 
 		case 'EHT320':
 		case 'EHT320-1':
 		case 'EHT320-2':
+		case 'UHR320':
+		case 'UHR320-1':
+		case 'UHR320-2':
 			let eht_center_seg0_map = [
 				[ 61, 31 ], [ 125, 95 ], [ 189, 159 ]
 			];
 
-			if (config.htmode == 'EHT320-2' || (config.htmode == 'EHT320' && config.channel > 189)) {
+			if ((config.htmode == 'EHT320-2' || config.htmode == 'UHR320-2') ||
+			    ((config.htmode == 'EHT320' || config.htmode == 'UHR320') && config.channel > 189)) {
 				eht_center_seg0_map = [
 					[ 93, 63 ], [ 157, 127 ], [ 221, 191 ]
 				];
@@ -334,14 +348,17 @@ function device_htmode_append(config) {
 
 			switch(config.htmode) {
 				case 'EHT320':
+				case 'UHR320':
 					config.eht_bw320_offset = 0;
 					break;
 
 				case 'EHT320-1':
+				case 'UHR320-1':
 					config.eht_bw320_offset = 1;
 					break;
 
 				case 'EHT320-2':
+				case 'UHR320-2':
 					config.eht_bw320_offset = 1;
 					break;
 
@@ -354,6 +371,9 @@ function device_htmode_append(config) {
 		case 'EHT40':
 		case 'EHT80':
 		case 'EHT160':
+		case 'UHR40':
+		case 'UHR80':
+		case 'UHR160':
 			config.op_class = 132 + config.eht_oper_chwidth;
 			break;
 		}
@@ -444,7 +464,7 @@ function device_htmode_append(config) {
 	}
 
 	/* 802.11ax */
-	if (wildcard(config.htmode, 'HE*') || wildcard(config.htmode, 'EHT*')) {
+	if (wildcard(config.htmode, 'HE*') || wildcard(config.htmode, 'EHT*') || wildcard(config.htmode, 'UHR*')) {
 		let he_phy_cap = phy_capabilities.he_phy_cap;
 		let he_mac_cap = phy_capabilities.he_mac_cap;
 
@@ -516,7 +536,7 @@ function device_htmode_append(config) {
 		]);
 	}
 
-	if (wildcard(config.htmode, 'EHT*')) {
+	if (wildcard(config.htmode, 'EHT*') || wildcard(config.htmode, 'UHR*')) {
 		let eht_phy_cap = phy_capabilities.eht_phy_cap;
 
 		config.ieee80211be = true;
@@ -547,6 +567,11 @@ function device_htmode_append(config) {
 			config.stationary_ap = true;
 			append_vars(config, [ 'he_6ghz_reg_pwr_type', 'eht_bw320_offset']);
 		}
+	}
+
+	if (wildcard(config.htmode, 'UHR*')) {
+		config.ieee80211bn = true;
+		append_vars(config, [ 'ieee80211bn' ]);
 	}
 
 	append_vars(config, [ 'tx_queue_data2_burst', 'stationary_ap' ]);

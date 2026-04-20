@@ -29,8 +29,8 @@ export function parse_encryption(config, dev_config, phy_features) {
 	 * BSSes. Explicit gcmp256 and sae_ext_key options override this per BSS.
 	 */
 	let compat = (config.auth_type == 'sae-compat');
-	config.gcmp256 ??= compat && wildcard(dev_config?.htmode ?? '', 'EHT*');
-	config.sae_ext_key ??= compat && wildcard(dev_config?.htmode ?? '', 'EHT*');
+	config.gcmp256 ??= compat && (wildcard(dev_config?.htmode ?? '', 'EHT*') || wildcard(dev_config?.htmode ?? '', 'UHR*'));
+	config.sae_ext_key ??= compat && (wildcard(dev_config?.htmode ?? '', 'EHT*') || wildcard(dev_config?.htmode ?? '', 'UHR*'));
 
 	switch(config.auth_type) {
 	case 'owe':

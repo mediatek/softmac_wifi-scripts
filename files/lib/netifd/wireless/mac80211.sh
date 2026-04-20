@@ -165,8 +165,8 @@ mac80211_hostapd_setup_base() {
 		ieee80211n=1
 		ht_capab=
 		case "$htmode" in
-			VHT20|HT20|HE20|EHT20) ;;
-			HT40*|VHT40|VHT80|VHT160|HE40|HE80|HE160|EHT40|EHT80|EHT160)
+			VHT20|HT20|HE20|EHT20|UHR20) ;;
+			HT40*|VHT40|VHT80|VHT160|HE40|HE80|HE160|EHT40|EHT80|EHT160|UHR40|UHR80|UHR160)
 				case "$hwmode" in
 					a)
 						case "$(( (($channel / 4) + $chan_ofs) % 2 ))" in
@@ -242,8 +242,8 @@ mac80211_hostapd_setup_base() {
 
 	idx="$channel"
 	case "$htmode" in
-		VHT20|HE20|EHT20) enable_ac=1;;
-		VHT40|HE40|EHT40)
+		VHT20|HE20|EHT20|UHR20) enable_ac=1;;
+		VHT40|HE40|EHT40|UHR40)
 			case "$(( (($channel / 4) + $chan_ofs) % 2 ))" in
 				1) idx=$(($channel + 2));;
 				0) idx=$(($channel - 2));;
@@ -251,7 +251,7 @@ mac80211_hostapd_setup_base() {
 			enable_ac=1
 			vht_center_seg0=$idx
 		;;
-		VHT80|HE80|EHT80)
+		VHT80|HE80|EHT80|UHR80)
 			case "$(( (($channel / 4) + $chan_ofs) % 4 ))" in
 				1) idx=$(($channel + 6));;
 				2) idx=$(($channel + 2));;
@@ -262,7 +262,7 @@ mac80211_hostapd_setup_base() {
 			vht_oper_chwidth=1
 			vht_center_seg0=$idx
 		;;
-		VHT160|HE160|EHT160|EHT320)
+		VHT160|HE160|EHT160|EHT320|UHR160|UHR320)
 			if [ "$band" = "6g" ]; then
 				case "$channel" in
 					1|5|9|13|17|21|25|29) idx=15;;
@@ -297,8 +297,8 @@ mac80211_hostapd_setup_base() {
 	[ "$band" = "6g" ] && {
 		op_class=
 		case "$htmode" in
-			HE20|EHT20) op_class=131;;
-			EHT320)
+			HE20|EHT20|UHR20) op_class=131;;
+			EHT320|UHR320)
 				case "$channel" in
 					1|5|9|13|17|21|25|29|33|37|41|45|49|53|57|61) idx=31;;
 					65|69|73|77|81|85|89|93|97|101|105|109|113|117|121|125) idx=95;;
@@ -310,7 +310,7 @@ mac80211_hostapd_setup_base() {
 				eht_center_seg0=$idx
 				eht_oper_chwidth=9
 			;;
-			HE*|EHT*) op_class=$((132 + $vht_oper_chwidth));;
+			HE*|EHT*|UHR*) op_class=$((132 + $vht_oper_chwidth));;
 		esac
 		[ -n "$op_class" ] && append base_cfg "op_class=$op_class" "$N"
 	}
@@ -439,9 +439,11 @@ mac80211_hostapd_setup_base() {
 	# 802.11ax
 	enable_ax=0
 	enable_be=0
+	enable_bn=0
 	case "$htmode" in
 		HE*) enable_ax=1 ;;
 		EHT*) enable_ax=1; enable_be=1 ;;
+		UHR*) enable_ax=1; enable_be=1; enable_bn=1 ;;
 	esac
 
 	if [ "$enable_ax" != "0" ]; then
@@ -521,6 +523,10 @@ mac80211_hostapd_setup_base() {
 			append base_cfg "eht_oper_chwidth=$eht_oper_chwidth" "$N"
 			append base_cfg "eht_oper_centr_freq_seg0_idx=$eht_center_seg0" "$N"
 		}
+	fi
+
+	if [ "$enable_bn" != "0" ]; then
+		append base_cfg "ieee80211bn=1" "$N"
 	fi
 
 	hostapd_prepare_device_config "$hostapd_conf_file" nl80211
@@ -764,10 +770,10 @@ mac80211_prepare_vif() {
 
 mac80211_prepare_iw_htmode() {
 	case "$htmode" in
-		HT20|VHT20|HE20|EHT20)
+		HT20|VHT20|HE20|EHT20|UHR20)
 			iw_htmode=HT20
 		;;
-		HT40*|VHT40|HE40|EHT40)
+		HT40*|VHT40|HE40|EHT40|UHR40)
 			case "$band" in
 				2g)
 					case "$htmode" in
@@ -791,10 +797,10 @@ mac80211_prepare_iw_htmode() {
 			esac
 			[ "$auto_channel" -gt 0 ] && iw_htmode="HT40+"
 		;;
-		VHT80|HE80|EHT80)
+		VHT80|HE80|EHT80|UHR80)
 			iw_htmode="80MHz"
 		;;
-		VHT160|HE160|EHT160)
+		VHT160|HE160|EHT160|UHR160)
 			iw_htmode="160MHz"
 		;;
 		NONE|NOHT)

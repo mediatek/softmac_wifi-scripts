@@ -191,6 +191,7 @@ function config_init(uci)
 				let dev = devices[dev_name];
 				if (dev && !dev.config.disabled &&
 				    (wildcard(dev.config.htmode, 'EHT*') ||
+				     wildcard(dev.config.htmode, 'UHR*') ||
 				     data.mode == 'sta'))
 					push(tmp_dev_names, dev_name);
 			}
