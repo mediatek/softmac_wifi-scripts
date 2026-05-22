@@ -209,6 +209,9 @@ function config_init(uci)
 			if (!dev || dev.config.disabled)
 				continue;
 
+			if (data.mode == 'sta')
+				dev.config.background_auto_ctrl = 0;
+
 			let handler = handlers[dev_name];
 			if (!handler)
 				continue;
