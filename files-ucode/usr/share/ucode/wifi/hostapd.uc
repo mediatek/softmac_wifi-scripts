@@ -383,12 +383,11 @@ function device_htmode_append(config) {
 
 	if (config.ieee80211ac && config.hw_mode == 'a') {
 		/* VHT capab */
-		if (config.vht_oper_chwidth < 2) {
-			config.vht160 = 0;
+		let vht_capab = phy_capabilities.vht_capa;
+
+		if ((vht_capab & 0x40) == 0) {
 			config.short_gi_160 = 0;
 		}
-
-		let vht_capab = phy_capabilities.vht_capa;
 
 		if (!config.etxbfen) {
 			config.su_beamformer = false;
