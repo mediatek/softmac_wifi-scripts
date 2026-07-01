@@ -67,8 +67,11 @@ wifi_config() {
 
 	ucode /usr/share/hostap/wifi-detect.uc
 
-	if (dmesg | grep -q "WM_TM"); then
+	fw_log=$(dmesg | grep -E "WM(_TM)? Firmware Version:|Mode:" | tail -n 1)
+	if [[ "$fw_log" == *WM_TM* || "$fw_log" == *Testmode* ]]; then
 		export MT76_ENV_WM_TM=1
+	else
+		unset MT76_ENV_WM_TM
 	fi
 
 	if (dmesg | grep -q "eeprom load fail"); then
