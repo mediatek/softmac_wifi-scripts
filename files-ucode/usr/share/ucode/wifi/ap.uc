@@ -103,9 +103,14 @@ function iface_auth_type(config, band) {
 		if (band == '6g') {
 			set_default(config, 'ieee80211w', 2);
 		} else {
-			set_default(config, 'ieee80211w', 0);
+			set_default(config, 'ieee80211w', 1);
+
+			if (config.transition_mode == 1)
+				config.rsn_override_omit_rsnxe = 0;
+			else
+				config.rsn_override_omit_rsnxe = 1;
+
 			config.rsn_override_mfp = 2;
-			config.rsn_override_omit_rsnxe = 1;
 		}
 		if (config.rsn_override_pairwise_2)
 			config.rsn_override_mfp_2 = 2;

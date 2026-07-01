@@ -28,9 +28,11 @@ export function parse_encryption(config, dev_config, phy_features) {
 	 * for WPA3-Personal (sae) and Transition (sae-mixed) mode and on non-EHT
 	 * BSSes. Explicit gcmp256 and sae_ext_key options override this per BSS.
 	 */
-	let compat = (config.auth_type == 'sae-compat');
-	config.gcmp256 ??= compat && (wildcard(dev_config?.htmode ?? '', 'EHT*') || wildcard(dev_config?.htmode ?? '', 'UHR*'));
-	config.sae_ext_key ??= compat && (wildcard(dev_config?.htmode ?? '', 'EHT*') || wildcard(dev_config?.htmode ?? '', 'UHR*'));
+	let compat = config.auth_type == 'sae-compat' || (config.auth_type == 'sae-mixed' && config.rsn_override != 0);
+	if (compat) {
+		config.gcmp256 ??= wildcard(dev_config?.htmode ?? '', 'EHT*') || wildcard(dev_config?.htmode ?? '', 'UHR*');
+		config.sae_ext_key ??= wildcard(dev_config?.htmode ?? '', 'EHT*') || wildcard(dev_config?.htmode ?? '', 'UHR*');
+	}
 
 	switch(config.auth_type) {
 	case 'owe':
@@ -67,12 +69,18 @@ export function parse_encryption(config, dev_config, phy_features) {
 
 	case 'psk3-mixed':
 	case 'sae-mixed':
-		config.auth_type = 'psk-sae';
-		break;
+		if (config.rsn_override == 0) {
+			config.auth_type = 'psk-sae';
+			break;
+		} else if (config.rsn_override == 1) {
+			config.transition_mode = 1;
+		}
+		// fallthrough
 
 	case 'sae-compat':
 		config.auth_type = 'psk-sae-compat';
-		config.wpa_pairwise = 'CCMP';
+		if (config.transition_mode != 1)
+			config.wpa_pairwise = 'CCMP';
 		if (dev_config.band != '6g')
 			config.rsn_override_pairwise = 'CCMP';
 		if (config.gcmp256 && phy_features?.cipher_gcmp256)
@@ -206,6 +214,8 @@ export function wpa_key_mgmt(config, band) {
 	case 'psk-sae-compat':
 		if (band == '6g') {
 			append_value(config, 'wpa_key_mgmt', 'SAE');
+			if (config.transition_mode == 1 && config.sae_ext_key)
+				append_value(config, 'wpa_key_mgmt', 'SAE-EXT-KEY');
 			if (config.ieee80211r)
 				append_value(config, 'wpa_key_mgmt', 'FT-SAE');
 
@@ -229,6 +239,18 @@ export function wpa_key_mgmt(config, band) {
 				append_value(config, 'rsn_override_key_mgmt_2', 'SAE-EXT-KEY');
 				if (config.ieee80211r)
 					append_value(config, 'rsn_override_key_mgmt_2', 'FT-SAE-EXT-KEY');
+			}
+		}
+
+		if (config.transition_mode == 1 && band != '6g') {
+			append_value(config, 'wpa_key_mgmt', 'SAE');
+			if (config.sae_ext_key)
+				append_value(config, 'wpa_key_mgmt', 'SAE-EXT-KEY');
+
+			if (config.ieee80211r) {
+				append_value(config, 'wpa_key_mgmt', 'FT-SAE');
+					if (config.sae_ext_key)
+						append_value(config, 'wpa_key_mgmt', 'FT-SAE-EXT-KEY');
 			}
 		}
 		break;
