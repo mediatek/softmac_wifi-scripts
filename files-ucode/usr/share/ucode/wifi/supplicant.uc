@@ -91,7 +91,8 @@ function sta_global_mtk_options(config) {
 };
 
 function sta_network_mtk_options(config) {
-	network_append_vars(config, [ 'disable_he', 'disable_eht', 'disable_uhr', 'mtk_vendor_element' ]);
+	network_append_vars(config, [ 'disable_he', 'disable_eht', 'disable_uhr' ]);
+	network_append_string_vars(config, [ 'mtk_vendor_element' ]);
 
 	if (config.ieee80211w) {
 		network_append_vars(config, [ 'beacon_prot' ]);
