@@ -43,8 +43,8 @@ function iface_setup(config) {
 	else
 		append('bss', config.ifname);
 
-	if (config.multicast_to_unicast || config.proxy_arp)
-		config.ap_isolate = 1;
+
+	config.ap_isolate = 1;
 
 	if (config.proxy_arp)
 		set_default(config, 'na_mcast_to_ucast', true);
