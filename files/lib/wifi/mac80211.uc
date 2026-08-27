@@ -163,6 +163,7 @@ set ${s}.noscan=${noscan}
 set ${si}.device='${name}'
 set ${si}.network='lan'
 set ${si}.mode='ap'
+set ${si}.mlo=${has_mlo ? 1 : 0}
 set ${si}.ssid='${defaults?.ssid || ssid}'
 set ${si}.encryption='${defaults?.encryption || encryption}'
 set ${si}.key='${defaults?.key || ""}'
