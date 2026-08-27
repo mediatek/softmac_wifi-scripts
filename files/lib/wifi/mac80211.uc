@@ -1,5 +1,5 @@
 #!/usr/bin/env ucode
-import { readfile, writefile } from "fs";
+import { readfile } from "fs";
 import * as uci from 'uci';
 
 const bands_order = [ "6G", "5G", "2G" ];
@@ -88,12 +88,6 @@ for (let phy_name, phy in board.wlan) {
 		let width = band.max_width;
 
 		let htmode = filter(htmode_order, (m) => band[lc(m)])[0];
-		/* Temp set the default config to EHT */
-		if (htmode == "UHR") {
-			htmode = "EHT";
-			writefile("/dev/kmsg", "wifi-scripts: set default htmode to EHT\n");
-		}
-
 		if (htmode)
 			htmode += width;
 		else
