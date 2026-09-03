@@ -846,6 +846,10 @@
 			"minimum": 0,
 			"maximum": 255
 		},
+		"sku_filename": {
+			"description": "Absolute path of the SKU file",
+			"type": "string"
+		},
 		"eht_bw320_offset": {
 			"description": "EHT BW320 offset",
 			"type": "number"
