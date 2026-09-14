@@ -79,12 +79,6 @@ export function parse_encryption(config, dev_config, phy_features) {
 
 	case 'sae-compat':
 		config.auth_type = 'psk-sae-compat';
-		if (config.transition_mode != 1)
-			config.wpa_pairwise = 'CCMP';
-		if (dev_config.band != '6g')
-			config.rsn_override_pairwise = 'CCMP';
-		if (config.gcmp256 && phy_features?.cipher_gcmp256)
-			config.rsn_override_pairwise_2 = 'GCMP-256';
 		break;
 
 	case 'sae-ext':
@@ -127,6 +121,28 @@ export function parse_encryption(config, dev_config, phy_features) {
 	case 'gcmp':
 		config.wpa_pairwise = 'GCMP';
 		break;
+	}
+
+	/* Append an explicit cipher choice to the RSN Override defaults. */
+	if (config.auth_type == 'psk-sae-compat') {
+		if (dev_config.band != '6g') {
+			if (!config.wpa_pairwise)
+				config.rsn_override_pairwise = 'CCMP';
+			else if (index(split(config.wpa_pairwise, ' '), 'CCMP') < 0)
+				config.rsn_override_pairwise = 'CCMP ' + config.wpa_pairwise;
+			else
+				config.rsn_override_pairwise = config.wpa_pairwise;
+		}
+		if (config.gcmp256 && phy_features?.cipher_gcmp256) {
+			if (!config.wpa_pairwise)
+				config.rsn_override_pairwise_2 = 'GCMP-256';
+			else if (index(split(config.wpa_pairwise, ' '), 'GCMP-256') < 0)
+				config.rsn_override_pairwise_2 = 'GCMP-256 ' + config.wpa_pairwise;
+			else
+				config.rsn_override_pairwise_2 = config.wpa_pairwise;
+		}
+		if (config.transition_mode != 1)
+			config.wpa_pairwise ??= 'CCMP';
 	}
 
 	if (!config.wpa)
