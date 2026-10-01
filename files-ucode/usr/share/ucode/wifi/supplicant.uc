@@ -64,7 +64,8 @@ function sta_global_mtk_options(config) {
 	append_vars(config, [ 'tx_queue_data2_burst', 'rsn_overriding', 'disable_rrm', 'mld_force_single_link' ]);
 	append_raw('wps_cred_add_sae=1');
 
-	if (config.auth_type in [ 'sae', 'psk-sae', 'sae-ext' ])
+	if (config.auth_type in [ 'sae', 'psk-sae', 'sae-ext' ] ||
+	    (config.auth_type == 'eppke' && config.base_akm in [ 8, 24 ]))
 		append_vars(config, [ 'sae_groups', 'sae_pwe' ]);
 
 	if (!config.mlo)
@@ -94,6 +95,9 @@ function sta_network_mtk_options(config) {
 	network_append_vars(config, [ 'disable_he', 'disable_eht', 'disable_uhr' ]);
 	network_append_string_vars(config, [ 'mtk_vendor_element' ]);
 
+	network_append('pmksa_privacy', config.pmksa_caching_privacy);
+	network_append_vars(config, [ 'pasn_groups' ]);
+
 	if (config.ieee80211w) {
 		network_append_vars(config, [ 'beacon_prot' ]);
 		network_append('group_mgmt', config.ieee80211w_mgmt_cipher);
@@ -104,9 +108,14 @@ function sta_network_mtk_options(config) {
 };
 
 function setup_sta(data, config) {
+	set_default(config, 'base_akm', 24);
+
 	iface.parse_encryption(config, data);
 
-	if (config.auth_type in [ 'sae', 'sae-ext', 'owe', 'eap2', 'eap192', 'dpp' ])
+	if (config.auth_type == 'eppke' && config.base_akm != 0 && !config.key)
+		netifd.setup_failed('INVALID_WPA_PSK');
+
+	if (config.auth_type in [ 'sae', 'sae-ext', 'owe', 'eap2', 'eap192', 'dpp', 'eppke' ])
 		config.ieee80211w = 2;
 	else if (config.auth_type in [ 'psk-sae' ] && !config.ieee80211w)
 		config.ieee80211w = 1;
@@ -176,6 +185,18 @@ function setup_sta(data, config) {
 
 	case 'wps':
 		config.key_mgmt = 'WPS';
+		break;
+
+	case 'eppke':
+		iface.wpa_key_mgmt(config);
+
+		if (config.key) {
+			if (length(config.key) == 64)
+				config.psk = config.key;
+			else
+				config.psk = `"${config.key}"`;
+		}
+
 		break;
 
 	case 'psk':

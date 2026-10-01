@@ -11,7 +11,7 @@ export function parse_encryption(config, dev_config, phy_features) {
 
 	config.wpa = 0;
 	for (let k, v in { 'wpa2*': 2, 'wpa3*': 2, '*psk2*': 2, 'psk3*': 2, 'sae*': 2,
-			'owe*': 2, 'dpp': 2, 'wpa*mixed*': 3, '*psk*mixed*': 3, 'wpa*': 1, '*psk*': 1, })
+			'owe*': 2, 'dpp': 2, 'eppke*': 2, 'wpa*mixed*': 3, '*psk*mixed*': 3, 'wpa*': 1, '*psk*': 1, })
 		if (wildcard(config.encryption, k)) {
 			config.wpa = v;
 			break;
@@ -41,6 +41,29 @@ export function parse_encryption(config, dev_config, phy_features) {
 
 	case 'dpp':
 		config.auth_type = 'dpp';
+		break;
+
+	case 'eppke-unauth':
+		config.auth_type = 'eppke-unauth';
+		config.wpa_pairwise = 'GCMP-256';
+		break;
+
+	case 'eppke':
+		config.auth_type = 'eppke';
+		switch (config.base_akm) {
+		case 2:
+		case 8:
+			config.wpa_pairwise = 'CCMP GCMP-256';
+			break;
+
+		default:
+			config.wpa_pairwise = 'GCMP-256';
+		}
+		break;
+
+	case 'eppke-mixed':
+		config.auth_type = 'eppke-mixed';
+		config.wpa_pairwise = 'CCMP GCMP-256';
 		break;
 
 	case 'wpa3-192':
@@ -283,6 +306,51 @@ export function wpa_key_mgmt(config, band) {
 
 	case 'dpp':
 		append_value(config, 'wpa_key_mgmt', 'DPP');
+		break;
+
+	case 'eppke-unauth':
+		append_value(config, 'wpa_key_mgmt', 'EPPKE');
+		break;
+
+	case 'eppke':
+		switch (config.base_akm) {
+		case 0:
+			break;
+
+		case 2:
+			append_value(config, 'wpa_key_mgmt', 'WPA-PSK');
+			if (config.ieee80211r)
+				append_value(config, 'wpa_key_mgmt', 'FT-PSK');
+			break;
+
+		case 8:
+			append_value(config, 'wpa_key_mgmt', 'SAE');
+			if (config.ieee80211r)
+				append_value(config, 'wpa_key_mgmt', 'FT-SAE');
+			break;
+
+		case 24:
+			append_value(config, 'wpa_key_mgmt', 'SAE-EXT-KEY');
+			if (config.ieee80211r)
+				append_value(config, 'wpa_key_mgmt', 'FT-SAE-EXT-KEY');
+			break;
+		}
+		append_value(config, 'wpa_key_mgmt', 'EPPKE');
+		break;
+
+	case 'eppke-mixed':
+		if (band != '6g') {
+			append_value(config, 'wpa_key_mgmt', 'WPA-PSK');
+			if (config.ieee80211r)
+				append_value(config, 'wpa_key_mgmt', 'FT-PSK');
+		}
+		append_value(config, 'wpa_key_mgmt', 'SAE');
+		if (config.ieee80211r)
+			append_value(config, 'wpa_key_mgmt', 'FT-SAE');
+		append_value(config, 'wpa_key_mgmt', 'SAE-EXT-KEY');
+		if (config.ieee80211r)
+			append_value(config, 'wpa_key_mgmt', 'FT-SAE-EXT-KEY');
+		append_value(config, 'wpa_key_mgmt', 'EPPKE');
 		break;
 	}
 

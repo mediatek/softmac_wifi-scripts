@@ -849,6 +849,11 @@
 			"type": "boolean",
 			"default": false
 		},
+		"pmksa_caching_privacy": {
+			"description": "PMKSA caching privacy (IEEE 802.11bi/D4.0 12.16.7); emitted as pmksa_caching_privacy in AP mode and pmksa_privacy in STA mode",
+			"type": "boolean",
+			"default": false
+		},
 		"port:port": {
 			"type": "number"
 		},
@@ -1299,6 +1304,19 @@
 		"owe_group": {
 			"description": "owe_groups for wpa_supplicant setup",
 			"type": "number"
+		},
+		"base_akm": {
+			"description": "base AKM suite type for the EPPKE STA mode (encryption=eppke): 0 = unauthenticated EPPKE (AKM 29 only), 2 = WPA-PSK, 8 = SAE, 24 = SAE-EXT-KEY (mutual, default). AKM 29 (EPPKE) is always added",
+			"type": "number",
+			"default": 24,
+			"enum": [ 0, 2, 8, 24 ]
+		},
+		"pasn_groups": {
+			"description": "PASN/EPPKE finite cyclic groups; AP: accepted groups (defaults to sae_groups for eppke-mixed), STA: groups tried in order (network block)",
+			"type": "array",
+			"items": {
+				"type": "number"
+			}
 		},
 		"pairwise": {
 			"description": "pairwise cipher",

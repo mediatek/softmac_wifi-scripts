@@ -96,8 +96,17 @@ function iface_auth_type(config, band) {
 	if (config.auth_type in [ 'sae', 'sae-ext', 'owe', 'eap2', 'eap192', 'dpp' ])
 		config.ieee80211w = 2;
 
+	if (config.auth_type in [ 'eppke-unauth', 'eppke-mixed' ])
+		config.assoc_frame_encryption = 1;
+
+	if (config.auth_type == 'eppke-unauth')
+		config.eppke_unauth = 1;
+
 	if (config.auth_type in [ 'psk-sae', 'eap-eap2' ])
 		set_default(config, 'ieee80211w', 1);
+
+	if (config.auth_type in [ 'eppke-unauth', 'eppke-mixed' ])
+		set_default(config, 'ieee80211w', band == '6g' ? 2 : 1);
 
 	if (config.auth_type == 'psk-sae-compat') {
 		if (band == '6g') {
@@ -121,7 +130,7 @@ function iface_auth_type(config, band) {
 		set_default(config, 'owe_ptk_workaround', 1);
 	}
 
-	if (config.auth_type in [ 'sae', 'psk-sae', 'psk-sae-compat' ]) {
+	if (config.auth_type in [ 'sae', 'psk-sae', 'psk-sae-compat', 'eppke-mixed' ]) {
 		config.sae_require_mfp = 1;
 		set_default(config, 'sae_groups', '19 20 21');
 		if (!config.ppsk) {
@@ -131,6 +140,9 @@ function iface_auth_type(config, band) {
 				set_default(config, 'sae_pwe', 2);
 		}
 	}
+
+	if (config.auth_type == 'eppke-mixed')
+		set_default(config, 'pasn_groups', config.sae_groups);
 
 	if (config.own_ip_addr)
 		config.dynamic_own_ip_addr = null;
@@ -162,6 +174,7 @@ function iface_auth_type(config, band) {
 	case 'psk-sae':
 	case 'psk-sae-compat':
 	case 'sae-ext':
+	case 'eppke-mixed':
 		config.vlan_possible = 1;
 		config.wps_possible = 1;
 
@@ -169,7 +182,7 @@ function iface_auth_type(config, band) {
 			iface_authentication_server(config);
 			config.macaddr_acl = 2;
 			config.wpa_psk_radius = 2;
-		} else if (length(config.key) == 64 && config.auth_type != 'psk-sae') {
+		} else if (length(config.key) == 64 && !(config.auth_type in [ 'psk-sae', 'eppke-mixed' ])) {
 			/* QT verifies that password length should not
 			 * be greater than 63 characters in WPA3-Personal
 			 * transition mode.
@@ -181,12 +194,12 @@ function iface_auth_type(config, band) {
 			 netifd.setup_failed('INVALID_WPA_PSK');
 		}
 
-		if (config.auth_type in [ 'psk', 'psk-sae', 'psk-sae-compat' ] && band != '6g') {
+		if (config.auth_type in [ 'psk', 'psk-sae', 'psk-sae-compat', 'eppke-mixed' ] && band != '6g') {
 			set_default(config, 'wpa_psk_file', `/var/run/hostapd-${config.ifname}.psk`);
 			touch_file(config.wpa_psk_file);
 		}
 
-		if (config.auth_type in [ 'sae', 'psk-sae', 'psk-sae-compat' ]) {
+		if (config.auth_type in [ 'sae', 'psk-sae', 'psk-sae-compat', 'eppke-mixed' ]) {
 			set_default(config, 'sae_password_file', `/var/run/hostapd-${config.ifname}.sae`);
 			touch_file(config.sae_password_file);
 		}
@@ -531,7 +544,7 @@ function iface_key_caching(config) {
 		set_default(config, 'okc', (config.auth_type in  [ 'sae', 'psk-sae', 'psk-sae-compat', 'sae-ext', 'owe' ]));
 	}
 
-	if (!config.okc && !config.fils)
+	if (!config.okc && !config.fils && !config.pmksa_caching_privacy)
 		config.disable_pmksa_caching = 1;
 
 	append_vars(config, [
@@ -598,6 +611,9 @@ function iface_mtk_options(config) {
 	if (config.auth_type in [ 'sae', 'psk-sae', 'sae-ext' ])
 		append_vars(config, [ 'sae_groups' ]);
 
+	if (config.auth_type in [ 'eppke-unauth', 'eppke-mixed' ])
+		append_vars(config, [ 'pasn_groups' ]);
+
 	if (config.auth_type in [ 'owe' ])
 		append_vars(config, [ 'owe_groups' ]);
 
@@ -627,6 +643,8 @@ export function generate(interface, data, config, vlans, stas, phy_features) {
 	iface_rates(config, data.config);
 
 	iface_auth_type(config, data.config.band);
+	append_vars(config, [ 'assoc_frame_encryption', 'eppke_unauth',
+			      'pmksa_caching_privacy' ]);
 
 	iface_accounting_server(config);
 
