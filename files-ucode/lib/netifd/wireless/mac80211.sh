@@ -64,7 +64,7 @@ function get_channel_frequency(band, channel) {
 	}
 }
 
-function setup_phy(phy, config, data) {
+function setup_phy(phy, config, data, radio_arg) {
 	if (config.channel == "auto")
 		config.channel = 0;
 	config.channel = +config.channel;
@@ -98,15 +98,15 @@ function setup_phy(phy, config, data) {
 	log(`Configuring '${phy}' distance: ${config.distance}`);
 	if (antenna_changed) {
 		log(`Setting antenna for '${phy}' txantenna: ${config.txantenna}, rxantenna: ${config.rxantenna}`);
-		system(`iw phy ${phy} set antenna ${config.txantenna} ${config.rxantenna} radio ${config.radio}`);
+		system(`iw phy ${phy} set antenna ${config.txantenna} ${config.rxantenna}${radio_arg}`);
 	}
 	system(`iw phy ${phy} set distance ${config.distance}`);
-	system(`iw phy ${phy} set txpower auto radio ${config.radio}`);
+	system(`iw phy ${phy} set txpower auto${radio_arg}`);
 
 	if (config.frag)
 		system(`iw phy ${phy} set frag ${config.frag}`);
 	if (config.rts)
-		system(`iw phy ${phy} set rts ${config.rts} radio ${config.radio}`);
+		system(`iw phy ${phy} set rts ${config.rts}${radio_arg}`);
 }
 
 function iw_htmode(config) {
@@ -203,7 +203,9 @@ function setup() {
 	delete config.hwmode;
 
 	validate('device', config);
-	setup_phy(data.phy, data.config, data.data);
+
+	let radio_arg = config.radio > -1 ? ` radio ${config.radio}` : "";
+	setup_phy(data.phy, data.config, data.data, radio_arg);
 
 	let supplicant_mesh;
 	let has_ap = false;
@@ -322,7 +324,7 @@ function setup() {
 	else
 		data.config.txpower = 'auto';
 
-	system(`iw phy ${data.phy} set txpower ${data.config.txpower} radio ${data.config.radio}`);
+	system(`iw phy ${data.phy} set txpower ${data.config.txpower}${radio_arg}`);
 
 	log(`Setup SMP Affinity`);
 	system(`/sbin/smp-mt76.sh`);
