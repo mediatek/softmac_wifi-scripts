@@ -532,7 +532,8 @@ function device_capabilities(config) {
 function device_mtk_options(config) {
 	append_vars(config, [ 'pp_mode', 'mu_onoff',
 			      'background_cert_mode', 'he_twt_responder', 'lpi_psd',
-			      'lpi_bcn_enhance', 'sku_idx', 'lpi_sku_idx' ]);
+			      'lpi_bcn_enhance', 'sku_idx', 'lpi_sku_idx',
+			      'sku_filename' ]);
 
 	append('ibf_enable', config.itxbfen);
 
